@@ -51,7 +51,7 @@ CREATE TABLE PERSONAL (
     Nombre            VARCHAR(80),
     ApellidoPaterno   VARCHAR(80),
     ApellidoMaterno   VARCHAR(80),
-    CedulaProfesional VARCHAR(40),
+    CedulaProfesional INT(8),
     RFC               VARCHAR(13),
     Calle             VARCHAR(100),
     NumExterior       VARCHAR(10),
@@ -64,7 +64,7 @@ CREATE TABLE PERSONAL (
 -- 5
 CREATE TABLE CORREO_CLIENTE (
     IDCliente         INT,
-    CorreoElectronico VARCHAR(120)
+    CorreoElectronico VARCHAR(255)
 );
 
 -- 6
@@ -109,7 +109,7 @@ CREATE TABLE HORARIO_PERSONAL (
 -- 10
 CREATE TABLE CORREO_PERSONAl (
     IDPersonal        INT,
-    CorreoElectronico VARCHAR(120)
+    CorreoElectronico VARCHAR(255)
 );
 
 -- 11
@@ -177,15 +177,15 @@ CREATE TABLE TELEFONO_SUCURSAL (
 -- 21
 CREATE TABLE MEDICAMENTO (
     IDMedicamento        INT,
-    NombreCientifico     VARCHAR(150),
     IDPersonal           INT,
     IDProveedor          INT,
+    NombreCientifico     VARCHAR(150),
     PrecioPublico        DECIMAL(10,2),
     FechaDeCaducidad     DATE,
     PrecioUnitario       DECIMAL(10,2),
     MedicamentosEsteriles BOOLEAN,
-    Preparaciones        VARCHAR(100),
-    Formulacion          VARCHAR(100),
+    Preparaciones        TEXT,
+    Formulacion          TEXT,
     PreparadosOficiales  BOOLEAN,
     Pediatrica           BOOLEAN,
     Dermatologica        BOOLEAN
@@ -212,8 +212,8 @@ CREATE TABLE PROVEER_MEDICAMENTO (
 -- 24
 CREATE TABLE PROVEER_INSUMO (
     IDProveedor              INT,
-    NombreCientifico         VARCHAR(150),
     IDSucursal               INT,
+    NombreCientifico         VARCHAR(150),
     CondicionDeAlmacenamiento VARCHAR(200),
     Cantidad                 INT,
     FechaDeRecibo            DATE,
