@@ -52,7 +52,7 @@ CREATE TABLE PERSONAL (
     Nombre            VARCHAR(80),
     ApellidoPaterno   VARCHAR(80),
     ApellidoMaterno   VARCHAR(80),
-    CedulaProfesional INT,
+    CedulaProfesional VARCHAR(8),
     RFC               VARCHAR(13),
     Calle             VARCHAR(100),
     NumExterior       VARCHAR(10),
