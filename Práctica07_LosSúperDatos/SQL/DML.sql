@@ -183,10 +183,10 @@ VALUES(1,Johny,83 Rowland Terrace,739,,Gällivare,Baja California Sur),
 
 -- INSERTAR DATOS EN CLIENTE
 INSERT INTO CLIENTE (IDCliente,Nombre,ApellidoPaterno,ApellidoMaterno,FechaNacimiento,Calle,NumExterior,NumInterior,Colonia,Estado,MetodoPago,NumeroTarjeta,VencimientoTarjeta,Usuario,Contrasena,EsClienteEnLinea,EsclienteFisico,EsPaciente) 
-VALUES(1,Cesya,Sides,Probets,05/04/1980,7 Maryland Road,593,,Babakanbungur,San Luis Potosí,Tarjeta,30456916213471,2029-08,cprobets0,cS4`u*yonYzqZrG,true,true,false),
+VALUES(1,Cesya,Sides,Probets,05/04/1980,7 Maryland Road,593,,Babakanbungur,San Luis Potosí,Tarjeta,30456916213471,2029-08,cprobets0,cS4uyonYzqZrG,true,true,false),
 (2,Lacee,Dipple,Margrie,31/07/2014,3 Continental Junction,255,,Lagunas,Ciudad de México,Tarjeta,3531846111504344,2032-08,lmargrie1,eH8$2VHHV,true,true,true),
 (3,Anthia,Elldred,Bohling,10/03/1963,77 Pond Crossing,189,40,Bárrio,Zacatecas,Tarjeta,6759803802290080194,2030-01,abohling2,rW4?npl!{1eoLqP,false,false,true),
-(4,Tore,Fredson,Philippou,17/03/2000,43 Fair Oaks Hill,637,33,Masvingo,Chihuahua,Efectivo,5206082091900265,2032-02,tphilippou3,"hF2""'""%>OlAbx",false,true,false),
+(4,Tore,Fredson,Philippou,17/03/2000,43 Fair Oaks Hill,637,33,Masvingo,Chihuahua,Efectivo,5206082091900265,2032-02,tphilippou3,hF2OlAbx,false,true,false),
 (5,Halsy,Georgievski,Enevold,11/08/1967,1 Wayridge Center,40,22,Chishtiān Mandi,Jalisco,Efectivo,4017952754823297,2033-04,henevold4,aW1</Gyqd4*mD,false,true,false),
 (6,Verile,Piscopiello,Sorby,13/10/1990,68 Scott Way,465,,Kołczygłowy,Chihuahua,Tarjeta,3568352373774069,2031-01,vsorby5,hL1{Ta_ofet/E,false,true,true),
 (7,Olympie,Patise,Cunniffe,28/02/1975,42 Moland Crossing,885,,Wenquan,Sinaloa,Efectivo,560223132068398945,2031-11,ocunniffe6,eN5>ZmT<@nrc,false,false,false),
@@ -2232,7 +2232,7 @@ VALUES (1,1,Shakshaft,12),
 
 
 -- INSERTAR DATOS EN TELEFONO_CLIENTE
-INSERT INTO TELEFONO_CLIENTE (idCliente,Telefono) 
+INSERT INTO TELEFONO_CLIENTE (IDCliente,Telefono) 
 VALUES (1,+212 658 774 0455),
 (2,+81 238 359 4920),
 (3,+27 420 783 5548),
@@ -7726,7 +7726,7 @@ VALUES (1,813,51,BTRD393032,526.64,07/07/2030,59,true,"Nam ultrices, libero non 
 (29,821,26,ECPO163409,476.86,03/01/2031,108,false,Fusce consequat. Nulla nisl.,Nullam molestie nibh in lectus.,true,false,false),
 (30,845,11,DJUK953414,442.88,10/01/2030,462,true,Phasellus sit amet erat. Nulla tempus.,Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Duis faucibus accumsan odio. Curabitur convallis.,false,true,true),
 (31,881,139,HWYQ498118,213.94,22/08/2028,175,true,"Morbi sem mauris, laoreet ut, rhoncus aliquet, pulvinar sed, nisl. Nunc rhoncus dui vel sem.","Lorem ipsum dolor sit amet, consectetuer adipiscing elit.",true,false,true),
-(32,IDPersonal,30,NIOW482855,622.86,17/09/2030,334,true,In hac habitasse platea dictumst. Etiam faucibus cursus urna.,Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nulla dapibus dolor vel est.,false,true,false),
+(32,890,30,NIOW482855,622.86,17/09/2030,334,true,In hac habitasse platea dictumst. Etiam faucibus cursus urna.,Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nulla dapibus dolor vel est.,false,true,false),
 (33,880,117,WTVY640196,695.75,30/10/2027,281,false,Proin at turpis a pede posuere nonummy. Integer non velit.,"Integer pede justo, lacinia eget, tincidunt eget, tempus vel, pede.",false,false,true),
 (34,757,142,XVXM941528,577.38,30/01/2031,320,true,Pellentesque at nulla.,Aenean auctor gravida sem. Praesent id massa id nisl venenatis lacinia.,false,true,true),
 (35,812,61,EJLE925391,486.26,12/05/2028,205,false,Curabitur at ipsum ac tellus semper interdum. Mauris ullamcorper purus sit amet nulla.,Nulla mollis molestie lorem. Quisque ut erat.,false,false,true),

@@ -70,7 +70,7 @@ CREATE TABLE CORREO_CLIENTE (
 
 -- 6
 CREATE TABLE TELEFONO_CLIENTE (
-    idCliente INT,
+    IDCliente INT,
     Telefono  VARCHAR(20)
 );
 
@@ -121,7 +121,7 @@ CREATE TABLE TELEFONO_PERSONAL (
 
 -- 12
 CREATE TABLE MEDICO (
-    idPersonal           INT,
+    IDPersonal           INT,
     Especialidad         VARCHAR(100),
     InstitucionEgreso    VARCHAR(150),
     VigenciaCertificacion DATE
@@ -129,7 +129,7 @@ CREATE TABLE MEDICO (
 
 -- 13
 CREATE TABLE ENFERMERA (
-    idPersonal              INT,
+    IDPersonal              INT,
     CertificadoReanimacion  VARCHAR(60),
     TipoProcedimiento       VARCHAR(100)
 );
@@ -151,13 +151,13 @@ CREATE TABLE CUIDADOR (
 
 -- 17
 CREATE TABLE FARMACEUTICO (
-    idPersonal INT
+    IDPersonal INT
 );
 
 -- 18
 CREATE TABLE CLINICA (
     IDClinica  INT,
-    idSucursal INT,
+    IDSucursal INT,
     Nombre     VARCHAR(150),
     NumCuartos INT
 );
@@ -171,7 +171,7 @@ CREATE TABLE HORARIO_CLINICA (
 
 -- 20
 CREATE TABLE TELEFONO_SUCURSAL (
-    idSucursal INT,
+    IDSucursal INT,
     Telefono   VARCHAR(20)
 );
 
@@ -784,7 +784,7 @@ COMMENT ON TABLE CORREO_CLIENTE IS 'Almacena los correos electrónicos asociados
 COMMENT ON COLUMN CORREO_CLIENTE.IDCliente IS 'Llave de referencia o identificador asociado a cliente.';
 COMMENT ON COLUMN CORREO_CLIENTE.CorreoElectronico IS 'Dirección de correo electrónico.';
 COMMENT ON TABLE TELEFONO_CLIENTE IS 'Almacena los teléfonos asociados a cada cliente.';
-COMMENT ON COLUMN TELEFONO_CLIENTE.idCliente IS 'Columna idCliente de la tabla TELEFONO_CLIENTE.';
+COMMENT ON COLUMN TELEFONO_CLIENTE.IDCliente IS 'Columna IDCliente de la tabla TELEFONO_CLIENTE.';
 COMMENT ON COLUMN TELEFONO_CLIENTE.Telefono IS 'Número telefónico de contacto.';
 COMMENT ON TABLE TELEFONO_PROVEEDOR IS 'Almacena los teléfonos asociados a cada proveedor.';
 COMMENT ON COLUMN TELEFONO_PROVEEDOR.IDProveedor IS 'Llave de referencia o identificador asociado a proveedor.';
@@ -813,12 +813,12 @@ COMMENT ON TABLE TELEFONO_PERSONAL IS 'Almacena los teléfonos del personal.';
 COMMENT ON COLUMN TELEFONO_PERSONAL.IDPersonal IS 'Llave de referencia o identificador asociado a personal.';
 COMMENT ON COLUMN TELEFONO_PERSONAL.Telefono IS 'Número telefónico de contacto.';
 COMMENT ON TABLE MEDICO IS 'Especialización del personal que desempeña el rol de médico.';
-COMMENT ON COLUMN MEDICO.idPersonal IS 'Columna idPersonal de la tabla MEDICO.';
+COMMENT ON COLUMN MEDICO.IDPersonal IS 'Columna IDPersonal de la tabla MEDICO.';
 COMMENT ON COLUMN MEDICO.Especialidad IS 'Dato correspondiente a Especialidad.';
 COMMENT ON COLUMN MEDICO.InstitucionEgreso IS 'Dato correspondiente a InstitucionEgreso.';
 COMMENT ON COLUMN MEDICO.VigenciaCertificacion IS 'Columna VigenciaCertificacion de la tabla MEDICO.';
 COMMENT ON TABLE ENFERMERA IS 'Especialización del personal que desempeña el rol de enfermera.';
-COMMENT ON COLUMN ENFERMERA.idPersonal IS 'Columna idPersonal de la tabla ENFERMERA.';
+COMMENT ON COLUMN ENFERMERA.IDPersonal IS 'Columna IDPersonal de la tabla ENFERMERA.';
 COMMENT ON COLUMN ENFERMERA.CertificadoReanimacion IS 'Dato correspondiente a CertificadoReanimacion.';
 COMMENT ON COLUMN ENFERMERA.TipoProcedimiento IS 'Dato correspondiente a TipoProcedimiento.';
 COMMENT ON TABLE CAJERO IS 'Especialización del personal que desempeña el rol de cajero.';
@@ -828,17 +828,17 @@ COMMENT ON COLUMN LIMPIEZA.IDPersonal IS 'Llave de referencia o identificador as
 COMMENT ON TABLE CUIDADOR IS 'Especialización del personal que desempeña el rol de cuidador.';
 COMMENT ON COLUMN CUIDADOR.IDPersonal IS 'Llave de referencia o identificador asociado a personal.';
 COMMENT ON TABLE FARMACEUTICO IS 'Especialización del personal que desempeña el rol de farmacéutico.';
-COMMENT ON COLUMN FARMACEUTICO.idPersonal IS 'Columna idPersonal de la tabla FARMACEUTICO.';
+COMMENT ON COLUMN FARMACEUTICO.IDPersonal IS 'Columna IDPersonal de la tabla FARMACEUTICO.';
 COMMENT ON TABLE CLINICA IS 'Almacena la información de la clínica o consultorio dentro de una sucursal.';
 COMMENT ON COLUMN CLINICA.IDClinica IS 'Identificador único de la clínica.';
-COMMENT ON COLUMN CLINICA.idSucursal IS 'Columna idSucursal de la tabla CLINICA.';
+COMMENT ON COLUMN CLINICA.IDSucursal IS 'Columna IDSucursal de la tabla CLINICA.';
 COMMENT ON COLUMN CLINICA.Nombre IS 'Nombre o denominación de la entidad.';
 COMMENT ON COLUMN CLINICA.NumCuartos IS 'Número de cuartos disponibles en la clínica.';
 COMMENT ON TABLE HORARIO_CLINICA IS 'Almacena los horarios de atención de cada clínica.';
 COMMENT ON COLUMN HORARIO_CLINICA.IDClinica IS 'Llave de referencia o identificador asociado a clinica.';
 COMMENT ON COLUMN HORARIO_CLINICA.Horario IS 'Dato correspondiente a Horario.';
 COMMENT ON TABLE TELEFONO_SUCURSAL IS 'Almacena los teléfonos asociados a cada sucursal.';
-COMMENT ON COLUMN TELEFONO_SUCURSAL.idSucursal IS 'Columna idSucursal de la tabla TELEFONO_SUCURSAL.';
+COMMENT ON COLUMN TELEFONO_SUCURSAL.IDSucursal IS 'Columna IDSucursal de la tabla TELEFONO_SUCURSAL.';
 COMMENT ON COLUMN TELEFONO_SUCURSAL.Telefono IS 'Número telefónico de contacto.';
 COMMENT ON TABLE MEDICAMENTO IS 'Almacena los medicamentos manejados por la farmacia o clínica.';
 COMMENT ON COLUMN MEDICAMENTO.IDMedicamento IS 'Identificador único del medicamento.';
