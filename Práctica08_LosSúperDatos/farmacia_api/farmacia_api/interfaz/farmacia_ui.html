@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LosSúperDatos — Farmacia</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #1a1a24;
+    --border: #2a2a3a;
+    --accent: #7c6aff;
+    --accent2: #ff6a9b;
+    --accent3: #6affcc;
+    --text: #e8e8f0;
+    --text-muted: #6b6b8a;
+    --success: #6affcc;
+    --error: #ff6a6a;
+    --warning: #ffcc6a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Mono', monospace;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(124,106,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,106,255,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  
+  .orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(120px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .orb-1 { width: 500px; height: 500px; background: rgba(124,106,255,0.12); top: -200px; right: -100px; }
+  .orb-2 { width: 400px; height: 400px; background: rgba(255,106,155,0.08); bottom: -150px; left: -100px; }
+
+
+  header {
+    position: relative;
+    z-index: 10;
+    padding: 24px 40px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    backdrop-filter: blur(20px);
+    background: rgba(10,10,15,0.8);
+    position: sticky;
+    top: 0;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+
+  .logo-text {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    letter-spacing: -0.5px;
+  }
+
+  .logo-text span { color: var(--accent); }
+
+  .api-badge {
+    font-size: 11px;
+    color: var(--accent3);
+    border: 1px solid rgba(106,255,204,0.3);
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+  }
+
+  
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 40px;
+  }
+
+ 
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 32px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 6px;
+    width: fit-content;
+  }
+
+  .tab {
+    padding: 10px 24px;
+    border-radius: 10px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+
+  .tab.active {
+    background: linear-gradient(135deg, var(--accent), #9b8aff);
+    color: white;
+    box-shadow: 0 4px 20px rgba(124,106,255,0.4);
+  }
+
+  .tab:hover:not(.active) { color: var(--text); background: var(--surface2); }
+
+  .section { display: none; }
+  .section.active { display: block; animation: fadeIn 0.3s ease; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .card:hover { border-color: rgba(124,106,255,0.3); }
+
+  .card-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+  }
+
+  .card-body { padding: 24px; }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .form-grid.full { grid-template-columns: 1fr; }
+
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group.span-2 { grid-column: span 2; }
+
+  label {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  input, select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  input:focus, select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(124,106,255,0.15);
+  }
+
+  input::placeholder { color: var(--text-muted); }
+
+  .checkbox-group {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+
+  .checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .checkbox-item input[type="checkbox"] {
+    width: 16px; height: 16px;
+    padding: 0;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+
+  .btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    letter-spacing: 0.3px;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), #9b8aff);
+    color: white;
+    box-shadow: 0 4px 15px rgba(124,106,255,0.3);
+  }
+
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(124,106,255,0.4); }
+
+  .btn-danger {
+    background: rgba(255,106,106,0.15);
+    color: var(--error);
+    border: 1px solid rgba(255,106,106,0.3);
+  }
+
+  .btn-danger:hover { background: rgba(255,106,106,0.25); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+  }
+
+  .btn-ghost:hover { color: var(--text); border-color: var(--accent); }
+
+  .btn-success {
+    background: rgba(106,255,204,0.15);
+    color: var(--success);
+    border: 1px solid rgba(106,255,204,0.3);
+  }
+
+  .btn-success:hover { background: rgba(106,255,204,0.25); }
+
+  .btn-sm { padding: 6px 12px; font-size: 11px; }
+
+  .btn-group { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+
+  .table-container {
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+
+  thead th {
+    background: var(--surface2);
+    padding: 12px 16px;
+    text-align: left;
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    border-bottom: 1px solid var(--border);
+  }
+
+  tbody tr {
+    border-bottom: 1px solid rgba(42,42,58,0.6);
+    transition: background 0.15s;
+  }
+
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(124,106,255,0.05); }
+
+  td {
+    padding: 12px 16px;
+    color: var(--text);
+    white-space: nowrap;
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .badge-true { background: rgba(106,255,204,0.15); color: var(--success); }
+  .badge-false { background: rgba(107,107,138,0.2); color: var(--text-muted); }
+
+  .toast-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .toast {
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-family: 'DM Mono', monospace;
+    backdrop-filter: blur(20px);
+    animation: slideIn 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 360px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+
+  .toast-success { background: rgba(106,255,204,0.15); border: 1px solid rgba(106,255,204,0.4); color: var(--success); }
+  .toast-error { background: rgba(255,106,106,0.15); border: 1px solid rgba(255,106,106,0.4); color: var(--error); }
+  .toast-info { background: rgba(124,106,255,0.15); border: 1px solid rgba(124,106,255,0.4); color: #b8acff; }
+
+  @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+  .empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--text-muted);
+  }
+
+  .empty-state .icon { font-size: 40px; margin-bottom: 12px; opacity: 0.5; }
+  .empty-state p { font-size: 13px; }
+
+  /* Loading */
+  .loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 32px;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    transition: border-color 0.2s;
+  }
+
+  .stat-card:hover { border-color: rgba(124,106,255,0.3); }
+
+  .stat-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .stat-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--text);
+  }
+
+  .stat-value.accent { color: var(--accent); }
+  .stat-value.accent2 { color: var(--accent2); }
+  .stat-value.accent3 { color: var(--accent3); }
+
+  .search-bar {
+    position: relative;
+    margin-bottom: 16px;
+  }
+
+  .search-bar input {
+    width: 100%;
+    padding-left: 36px;
+  }
+
+  .search-bar::before {
+    content: '⌕';
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 16px;
+    z-index: 1;
+  }
+
+  /* Section title */
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 6px;
+    letter-spacing: -0.5px;
+  }
+
+  .section-subtitle {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 28px;
+  }
+
+  .action-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .modal-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 700px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+  }
+
+  .modal-header {
+    padding: 24px 28px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    background: var(--surface);
+    z-index: 1;
+  }
+
+  .modal-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 16px; }
+
+  .modal-close {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 20px;
+    cursor: pointer;
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+
+  .modal-close:hover { background: var(--surface2); color: var(--text); }
+
+  .modal-body { padding: 28px; }
+
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 20px 0;
+  }
+
+ 
+  .id-search {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .id-search input { flex: 1; }
+</style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">💊</div>
+    <div class="logo-text">Los<span>Súper</span>Datos</div>
+  </div>
+  <div class="api-badge">API · localhost:8000</div>
+</header>
+
+<div class="container">
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('clientes')">👤 Clientes</button>
+    <button class="tab" onclick="switchTab('sucursales')">🏥 Sucursales</button>
+  </div>
+
+  <!-- ===================== CLIENTES ===================== -->
+  <div id="section-clientes" class="section active">
+    <div class="section-title">Gestión de Clientes</div>
+    <div class="section-subtitle">Interfaz bonita para gestionar clientes</div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Total clientes</div>
+        <div class="stat-value accent" id="stat-total-clientes">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">En línea</div>
+        <div class="stat-value accent2" id="stat-online">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Físicos</div>
+        <div class="stat-value accent3" id="stat-fisico">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Pacientes</div>
+        <div class="stat-value" id="stat-paciente">—</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <!-- Formulario crear cliente -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><span class="dot"></span> Nuevo Cliente</div>
+        </div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>ID Cliente *</label>
+              <input type="number" id="c-id" placeholder="101">
+            </div>
+            <div class="form-group">
+              <label>Nombre *</label>
+              <input type="text" id="c-nombre" placeholder="Ana">
+            </div>
+            <div class="form-group">
+              <label>Apellido Paterno *</label>
+              <input type="text" id="c-appaterno" placeholder="García">
+            </div>
+            <div class="form-group">
+              <label>Apellido Materno</label>
+              <input type="text" id="c-apmaterno" placeholder="López">
+            </div>
+            <div class="form-group">
+              <label>Fecha Nacimiento</label>
+              <input type="date" id="c-fechanac">
+            </div>
+            <div class="form-group">
+              <label>Estado</label>
+              <input type="text" id="c-estado" placeholder="CDMX">
+            </div>
+            <div class="form-group">
+              <label>Calle</label>
+              <input type="text" id="c-calle" placeholder="Av. Insurgentes">
+            </div>
+            <div class="form-group">
+              <label>Núm. Exterior</label>
+              <input type="text" id="c-numext" placeholder="42">
+            </div>
+            <div class="form-group">
+              <label>Núm. Interior</label>
+              <input type="text" id="c-numint" placeholder="—">
+            </div>
+            <div class="form-group">
+              <label>Colonia</label>
+              <input type="text" id="c-colonia" placeholder="Roma Norte">
+            </div>
+            <div class="form-group">
+              <label>Método de Pago</label>
+              <select id="c-metodopago">
+                <option value="">— Seleccionar —</option>
+                <option>Tarjeta</option>
+                <option>Efectivo</option>
+                <option>Transferencia</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Número Tarjeta</label>
+              <input type="text" id="c-tarjeta" placeholder="4111...">
+            </div>
+            <div class="form-group">
+              <label>Venc. Tarjeta</label>
+              <input type="date" id="c-vencimiento">
+            </div>
+            <div class="form-group">
+              <label>Usuario</label>
+              <input type="text" id="c-usuario" placeholder="ana.garcia">
+            </div>
+            <div class="form-group span-2">
+              <label>Contraseña</label>
+              <input type="password" id="c-contrasena" placeholder="••••••••">
+            </div>
+            <div class="form-group span-2">
+              <label>Tipo de cliente</label>
+              <div class="checkbox-group">
+                <label class="checkbox-item">
+                  <input type="checkbox" id="c-enlinea"> Cliente en línea
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" id="c-fisico"> Cliente físico
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" id="c-paciente"> Paciente
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-primary" onclick="createCliente()">＋ Crear Cliente</button>
+            <button class="btn btn-ghost" onclick="clearClienteForm()">Limpiar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lista clientes -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><span class="dot" style="background:var(--accent3)"></span> Lista de Clientes</div>
+          <button class="btn btn-ghost btn-sm" onclick="loadClientes()">↻ Actualizar</button>
+        </div>
+        <div class="card-body">
+          <div class="search-bar">
+            <input type="text" id="search-clientes" placeholder="Buscar por nombre..." oninput="filterClientes()">
+          </div>
+          <div id="clientes-table-container">
+            <div class="loading"><div class="spinner"></div> Cargando...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Buscar/Eliminar por ID -->
+    <div class="card" style="margin-top: 24px;">
+      <div class="card-header">
+        <div class="card-title"><span class="dot" style="background:var(--accent2)"></span> Buscar / Eliminar por ID</div>
+      </div>
+      <div class="card-body">
+        <div class="id-search">
+          <input type="number" id="c-search-id" placeholder="ID del cliente...">
+          <button class="btn btn-ghost" onclick="getClienteById()">🔍 Buscar</button>
+          <button class="btn btn-danger" onclick="deleteCliente()">🗑 Eliminar</button>
+        </div>
+        <div id="cliente-detail"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== SUCURSALES ===================== -->
+  <div id="section-sucursales" class="section">
+    <div class="section-title">Gestión de Sucursales</div>
+    <div class="section-subtitle">CRUD completo · /api/sucursal/</div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Total sucursales</div>
+        <div class="stat-value accent" id="stat-total-sucursales">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Estados</div>
+        <div class="stat-value accent3" id="stat-estados">—</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <!-- Crear sucursal -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><span class="dot"></span> Nueva Sucursal</div>
+        </div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>ID Sucursal *</label>
+              <input type="number" id="s-id" placeholder="999">
+            </div>
+            <div class="form-group">
+              <label>Nombre *</label>
+              <input type="text" id="s-nombre" placeholder="Sucursal Centro">
+            </div>
+            <div class="form-group">
+              <label>Calle</label>
+              <input type="text" id="s-calle" placeholder="Av. Reforma">
+            </div>
+            <div class="form-group">
+              <label>Núm. Exterior</label>
+              <input type="text" id="s-numext" placeholder="123">
+            </div>
+            <div class="form-group">
+              <label>Núm. Interior</label>
+              <input type="text" id="s-numint" placeholder="—">
+            </div>
+            <div class="form-group">
+              <label>Colonia</label>
+              <input type="text" id="s-colonia" placeholder="Juárez">
+            </div>
+            <div class="form-group span-2">
+              <label>Estado</label>
+              <input type="text" id="s-estado" placeholder="CDMX">
+            </div>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-primary" onclick="createSucursal()">＋ Crear Sucursal</button>
+            <button class="btn btn-ghost" onclick="clearSucursalForm()">Limpiar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lista sucursales -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><span class="dot" style="background:var(--accent3)"></span> Lista de Sucursales</div>
+          <button class="btn btn-ghost btn-sm" onclick="loadSucursales()">↻ Actualizar</button>
+        </div>
+        <div class="card-body">
+          <div class="search-bar">
+            <input type="text" id="search-sucursales" placeholder="Buscar por nombre..." oninput="filterSucursales()">
+          </div>
+          <div id="sucursales-table-container">
+            <div class="loading"><div class="spinner"></div> Cargando...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Buscar/Eliminar sucursal -->
+    <div class="card" style="margin-top: 24px;">
+      <div class="card-header">
+        <div class="card-title"><span class="dot" style="background:var(--accent2)"></span> Buscar / Eliminar por ID</div>
+      </div>
+      <div class="card-body">
+        <div class="id-search">
+          <input type="number" id="s-search-id" placeholder="ID de sucursal...">
+          <button class="btn btn-ghost" onclick="getSucursalById()">🔍 Buscar</button>
+          <button class="btn btn-danger" onclick="deleteSucursal()">🗑 Eliminar</button>
+        </div>
+        <div id="sucursal-detail"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal editar cliente -->
+<div class="modal-overlay" id="modal-cliente">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">✏️ Editar Cliente</div>
+      <button class="modal-close" onclick="closeModal('modal-cliente')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Nombre</label>
+          <input type="text" id="e-c-nombre">
+        </div>
+        <div class="form-group">
+          <label>Apellido Paterno</label>
+          <input type="text" id="e-c-appaterno">
+        </div>
+        <div class="form-group">
+          <label>Apellido Materno</label>
+          <input type="text" id="e-c-apmaterno">
+        </div>
+        <div class="form-group">
+          <label>Fecha Nacimiento</label>
+          <input type="date" id="e-c-fechanac">
+        </div>
+        <div class="form-group">
+          <label>Calle</label>
+          <input type="text" id="e-c-calle">
+        </div>
+        <div class="form-group">
+          <label>Núm. Exterior</label>
+          <input type="text" id="e-c-numext">
+        </div>
+        <div class="form-group">
+          <label>Núm. Interior</label>
+          <input type="text" id="e-c-numint">
+        </div>
+        <div class="form-group">
+          <label>Colonia</label>
+          <input type="text" id="e-c-colonia">
+        </div>
+        <div class="form-group">
+          <label>Estado</label>
+          <input type="text" id="e-c-estado">
+        </div>
+        <div class="form-group">
+          <label>Método de Pago</label>
+          <select id="e-c-metodopago">
+            <option value="">— Seleccionar —</option>
+            <option>Tarjeta</option>
+            <option>Efectivo</option>
+            <option>Transferencia</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Número Tarjeta</label>
+          <input type="text" id="e-c-tarjeta">
+        </div>
+        <div class="form-group">
+          <label>Venc. Tarjeta</label>
+          <input type="date" id="e-c-vencimiento">
+        </div>
+        <div class="form-group">
+          <label>Usuario</label>
+          <input type="text" id="e-c-usuario">
+        </div>
+        <div class="form-group">
+          <label>Contraseña</label>
+          <input type="password" id="e-c-contrasena">
+        </div>
+        <div class="form-group span-2">
+          <label>Tipo de cliente</label>
+          <div class="checkbox-group">
+            <label class="checkbox-item"><input type="checkbox" id="e-c-enlinea"> En línea</label>
+            <label class="checkbox-item"><input type="checkbox" id="e-c-fisico"> Físico</label>
+            <label class="checkbox-item"><input type="checkbox" id="e-c-paciente"> Paciente</label>
+          </div>
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="updateCliente()">💾 Guardar cambios</button>
+        <button class="btn btn-ghost" onclick="closeModal('modal-cliente')">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal editar sucursal -->
+<div class="modal-overlay" id="modal-sucursal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">✏️ Editar Sucursal</div>
+      <button class="modal-close" onclick="closeModal('modal-sucursal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Nombre</label>
+          <input type="text" id="e-s-nombre">
+        </div>
+        <div class="form-group">
+          <label>Calle</label>
+          <input type="text" id="e-s-calle">
+        </div>
+        <div class="form-group">
+          <label>Núm. Exterior</label>
+          <input type="text" id="e-s-numext">
+        </div>
+        <div class="form-group">
+          <label>Núm. Interior</label>
+          <input type="text" id="e-s-numint">
+        </div>
+        <div class="form-group">
+          <label>Colonia</label>
+          <input type="text" id="e-s-colonia">
+        </div>
+        <div class="form-group">
+          <label>Estado</label>
+          <input type="text" id="e-s-estado">
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="updateSucursal()">💾 Guardar cambios</button>
+        <button class="btn btn-ghost" onclick="closeModal('modal-sucursal')">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+  const API = 'http://127.0.0.1:8000';
+  let allClientes = [];
+  let allSucursales = [];
+  let editingClienteId = null;
+  let editingSucursalId = null;
+
+  // ── Tabs ──────────────────────────────────────────────
+  function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById(`section-${tab}`).classList.add('active');
+    if (tab === 'clientes') loadClientes();
+    if (tab === 'sucursales') loadSucursales();
+  }
+
+  // ── Toast ─────────────────────────────────────────────
+  function toast(msg, type = 'info') {
+    const icons = { success: '✓', error: '✕', info: 'ℹ' };
+    const el = document.createElement('div');
+    el.className = `toast toast-${type}`;
+    el.innerHTML = `<span>${icons[type]}</span><span>${msg}</span>`;
+    document.getElementById('toast-container').appendChild(el);
+    setTimeout(() => el.remove(), 3500);
+  }
+
+  // ── Modal ─────────────────────────────────────────────
+  function openModal(id) { document.getElementById(id).classList.add('open'); }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+  document.querySelectorAll('.modal-overlay').forEach(m => {
+    m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+  });
+
+  // ── CLIENTES ──────────────────────────────────────────
+  async function loadClientes() {
+    const cont = document.getElementById('clientes-table-container');
+    cont.innerHTML = '<div class="loading"><div class="spinner"></div> Cargando...</div>';
+    try {
+      const res = await fetch(`${API}/api/clientes/`);
+      allClientes = await res.json();
+      renderClientesTable(allClientes);
+      updateClienteStats(allClientes);
+    } catch (e) {
+      cont.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>No se pudo conectar a la API.<br>¿Está corriendo el servidor?</p></div>`;
+    }
+  }
+
+  function updateClienteStats(data) {
+    document.getElementById('stat-total-clientes').textContent = data.length;
+    document.getElementById('stat-online').textContent = data.filter(c => c.esclienteenlinea).length;
+    document.getElementById('stat-fisico').textContent = data.filter(c => c.esclientefisico).length;
+    document.getElementById('stat-paciente').textContent = data.filter(c => c.espaciente).length;
+  }
+
+  function renderClientesTable(data) {
+    const cont = document.getElementById('clientes-table-container');
+    if (!data.length) {
+      cont.innerHTML = '<div class="empty-state"><div class="icon">👤</div><p>No hay clientes registrados</p></div>';
+      return;
+    }
+    cont.innerHTML = `
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>Nombre</th><th>Apellidos</th><th>Estado</th>
+              <th>En línea</th><th>Físico</th><th>Paciente</th><th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${data.map(c => `
+              <tr>
+                <td>${c.idcliente}</td>
+                <td>${c.nombre || '—'}</td>
+                <td>${(c.apellidopaterno || '') + ' ' + (c.apellidomaterno || '')}</td>
+                <td>${c.estado || '—'}</td>
+                <td><span class="badge badge-${c.esclienteenlinea}">${c.esclienteenlinea ? 'Sí' : 'No'}</span></td>
+                <td><span class="badge badge-${c.esclientefisico}">${c.esclientefisico ? 'Sí' : 'No'}</span></td>
+                <td><span class="badge badge-${c.espaciente}">${c.espaciente ? 'Sí' : 'No'}</span></td>
+                <td>
+                  <button class="btn btn-ghost btn-sm" onclick="openEditCliente(${c.idcliente})">✏️</button>
+                </td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  }
+
+  function filterClientes() {
+    const q = document.getElementById('search-clientes').value.toLowerCase();
+    renderClientesTable(allClientes.filter(c =>
+      (c.nombre || '').toLowerCase().includes(q) ||
+      (c.apellidopaterno || '').toLowerCase().includes(q) ||
+      (c.apellidomaterno || '').toLowerCase().includes(q)
+    ));
+  }
+
+  async function createCliente() {
+    const data = {
+      idcliente: parseInt(document.getElementById('c-id').value),
+      nombre: document.getElementById('c-nombre').value,
+      apellidopaterno: document.getElementById('c-appaterno').value,
+      apellidomaterno: document.getElementById('c-apmaterno').value,
+      fechanacimiento: document.getElementById('c-fechanac').value || null,
+      calle: document.getElementById('c-calle').value || null,
+      numexterior: document.getElementById('c-numext').value || null,
+      numinterior: document.getElementById('c-numint').value || null,
+      colonia: document.getElementById('c-colonia').value || null,
+      estado: document.getElementById('c-estado').value || null,
+      metodopago: document.getElementById('c-metodopago').value || null,
+      numerotarjeta: document.getElementById('c-tarjeta').value || null,
+      vencimientotarjeta: document.getElementById('c-vencimiento').value || null,
+      usuario: document.getElementById('c-usuario').value || null,
+      contrasena: document.getElementById('c-contrasena').value || null,
+      esclienteenlinea: document.getElementById('c-enlinea').checked,
+      esclientefisico: document.getElementById('c-fisico').checked,
+      espaciente: document.getElementById('c-paciente').checked,
+    };
+    if (!data.idcliente || !data.nombre || !data.apellidopaterno) {
+      toast('ID, Nombre y Apellido Paterno son requeridos', 'error'); return;
+    }
+    try {
+      const res = await fetch(`${API}/api/clientes/`, {
+        method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data)
+      });
+      if (res.status === 201) { toast('Cliente creado exitosamente', 'success'); clearClienteForm(); loadClientes(); }
+      else { const err = await res.json(); toast(`Error: ${err.error || res.status}`, 'error'); }
+    } catch (e) { toast('No se pudo conectar a la API', 'error'); }
+  }
+
+  async function getClienteById() {
+    const id = document.getElementById('c-search-id').value;
+    if (!id) { toast('Ingresa un ID', 'error'); return; }
+    try {
+      const res = await fetch(`${API}/api/clientes/${id}/`);
+      const div = document.getElementById('cliente-detail');
+      if (res.status === 404) { div.innerHTML = `<div class="empty-state"><div class="icon">🔍</div><p>Cliente ID ${id} no encontrado</p></div>`; return; }
+      const c = await res.json();
+      div.innerHTML = `
+        <div style="background:var(--surface2);border-radius:10px;padding:16px;border:1px solid var(--border);margin-top:4px">
+          <div style="font-family:'Syne',sans-serif;font-weight:700;margin-bottom:12px;font-size:15px">${c.nombre} ${c.apellidopaterno} ${c.apellidomaterno || ''}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;color:var(--text-muted)">
+            <div>ID: <span style="color:var(--text)">${c.idcliente}</span></div>
+            <div>Estado: <span style="color:var(--text)">${c.estado || '—'}</span></div>
+            <div>Colonia: <span style="color:var(--text)">${c.colonia || '—'}</span></div>
+            <div>Método pago: <span style="color:var(--text)">${c.metodopago || '—'}</span></div>
+            <div>Usuario: <span style="color:var(--text)">${c.usuario || '—'}</span></div>
+            <div>Nac.: <span style="color:var(--text)">${c.fechanacimiento || '—'}</span></div>
+          </div>
+          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+            <span class="badge badge-${c.esclienteenlinea}">En línea: ${c.esclienteenlinea ? 'Sí' : 'No'}</span>
+            <span class="badge badge-${c.esclientefisico}">Físico: ${c.esclientefisico ? 'Sí' : 'No'}</span>
+            <span class="badge badge-${c.espaciente}">Paciente: ${c.espaciente ? 'Sí' : 'No'}</span>
+          </div>
+        </div>`;
+    } catch (e) { toast('Error al conectar con la API', 'error'); }
+  }
+
+  async function deleteCliente() {
+    const id = document.getElementById('c-search-id').value;
+    if (!id) { toast('Ingresa un ID', 'error'); return; }
+    if (!confirm(`¿Eliminar cliente ID ${id}? Esta acción no se puede deshacer.`)) return;
+    try {
+      const res = await fetch(`${API}/api/clientes/${id}/`, { method: 'DELETE' });
+      if (res.status === 204) { toast(`Cliente ${id} eliminado`, 'success'); loadClientes(); document.getElementById('cliente-detail').innerHTML = ''; }
+      else if (res.status === 404) { toast('Cliente no encontrado', 'error'); }
+      else { toast(`Error al eliminar: ${res.status}`, 'error'); }
+    } catch (e) { toast('Error al conectar con la API', 'error'); }
+  }
+
+  async function openEditCliente(id) {
+    try {
+      const res = await fetch(`${API}/api/clientes/${id}/`);
+      const c = await res.json();
+      editingClienteId = id;
+      document.getElementById('e-c-nombre').value = c.nombre || '';
+      document.getElementById('e-c-appaterno').value = c.apellidopaterno || '';
+      document.getElementById('e-c-apmaterno').value = c.apellidomaterno || '';
+      document.getElementById('e-c-fechanac').value = c.fechanacimiento || '';
+      document.getElementById('e-c-calle').value = c.calle || '';
+      document.getElementById('e-c-numext').value = c.numexterior || '';
+      document.getElementById('e-c-numint').value = c.numinterior || '';
+      document.getElementById('e-c-colonia').value = c.colonia || '';
+      document.getElementById('e-c-estado').value = c.estado || '';
+      document.getElementById('e-c-metodopago').value = c.metodopago || '';
+      document.getElementById('e-c-tarjeta').value = c.numerotarjeta || '';
+      document.getElementById('e-c-vencimiento').value = c.vencimientotarjeta || '';
+      document.getElementById('e-c-usuario').value = c.usuario || '';
+      document.getElementById('e-c-contrasena').value = c.contrasena || '';
+      document.getElementById('e-c-enlinea').checked = c.esclienteenlinea;
+      document.getElementById('e-c-fisico').checked = c.esclientefisico;
+      document.getElementById('e-c-paciente').checked = c.espaciente;
+      openModal('modal-cliente');
+    } catch (e) { toast('Error al cargar cliente', 'error'); }
+  }
+
+  async function updateCliente() {
+    const data = {
+      nombre: document.getElementById('e-c-nombre').value,
+      apellidopaterno: document.getElementById('e-c-appaterno').value,
+      apellidomaterno: document.getElementById('e-c-apmaterno').value,
+      fechanacimiento: document.getElementById('e-c-fechanac').value || null,
+      calle: document.getElementById('e-c-calle').value || null,
+      numexterior: document.getElementById('e-c-numext').value || null,
+      numinterior: document.getElementById('e-c-numint').value || null,
+      colonia: document.getElementById('e-c-colonia').value || null,
+      estado: document.getElementById('e-c-estado').value || null,
+      metodopago: document.getElementById('e-c-metodopago').value || null,
+      numerotarjeta: document.getElementById('e-c-tarjeta').value || null,
+      vencimientotarjeta: document.getElementById('e-c-vencimiento').value || null,
+      usuario: document.getElementById('e-c-usuario').value || null,
+      contrasena: document.getElementById('e-c-contrasena').value || null,
+      esclienteenlinea: document.getElementById('e-c-enlinea').checked,
+      esclientefisico: document.getElementById('e-c-fisico').checked,
+      espaciente: document.getElementById('e-c-paciente').checked,
+    };
+    try {
+      const res = await fetch(`${API}/api/clientes/${editingClienteId}/`, {
+        method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data)
+      });
+      if (res.ok) { toast('Cliente actualizado correctamente', 'success'); closeModal('modal-cliente'); loadClientes(); }
+      else { const err = await res.json(); toast(`Error: ${err.error || res.status}`, 'error'); }
+    } catch (e) { toast('Error al conectar con la API', 'error'); }
+  }
+
+  function clearClienteForm() {
+    ['c-id','c-nombre','c-appaterno','c-apmaterno','c-fechanac','c-calle','c-numext','c-numint','c-colonia','c-estado','c-tarjeta','c-vencimiento','c-usuario','c-contrasena'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('c-metodopago').value = '';
+    ['c-enlinea','c-fisico','c-paciente'].forEach(id => document.getElementById(id).checked = false);
+  }
+
+  // ── SUCURSALES ────────────────────────────────────────
+  async function loadSucursales() {
+    const cont = document.getElementById('sucursales-table-container');
+    cont.innerHTML = '<div class="loading"><div class="spinner"></div> Cargando...</div>';
+    try {
+      const res = await fetch(`${API}/api/sucursal/`);
+      allSucursales = await res.json();
+      renderSucursalesTable(allSucursales);
+      document.getElementById('stat-total-sucursales').textContent = allSucursales.length;
+      const estados = new Set(allSucursales.map(s => s.estado).filter(Boolean));
+      document.getElementById('stat-estados').textContent = estados.size;
+    } catch (e) {
+      cont.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>No se pudo conectar a la API</p></div>`;
+    }
+  }
+
+  function renderSucursalesTable(data) {
+    const cont = document.getElementById('sucursales-table-container');
+    if (!data.length) {
+      cont.innerHTML = '<div class="empty-state"><div class="icon">🏥</div><p>No hay sucursales registradas</p></div>';
+      return;
+    }
+    cont.innerHTML = `
+      <div class="table-container">
+        <table>
+          <thead><tr><th>ID</th><th>Nombre</th><th>Calle</th><th>Colonia</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody>
+            ${data.map(s => `
+              <tr>
+                <td>${s.idsucursal}</td>
+                <td>${s.nombre || '—'}</td>
+                <td>${(s.calle || '') + ' ' + (s.numexterior || '')}</td>
+                <td>${s.colonia || '—'}</td>
+                <td>${s.estado || '—'}</td>
+                <td><button class="btn btn-ghost btn-sm" onclick="openEditSucursal(${s.idsucursal})">✏️</button></td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  }
+
+  function filterSucursales() {
+    const q = document.getElementById('search-sucursales').value.toLowerCase();
+    renderSucursalesTable(allSucursales.filter(s =>
+      (s.nombre || '').toLowerCase().includes(q) ||
+      (s.estado || '').toLowerCase().includes(q)
+    ));
+  }
+
+  async function createSucursal() {
+    const data = {
+      idsucursal: parseInt(document.getElementById('s-id').value),
+      nombre: document.getElementById('s-nombre').value,
+      calle: document.getElementById('s-calle').value || null,
+      numexterior: document.getElementById('s-numext').value || null,
+      numinterior: document.getElementById('s-numint').value || null,
+      colonia: document.getElementById('s-colonia').value || null,
+      estado: document.getElementById('s-estado').value || null,
+    };
+    if (!data.idsucursal || !data.nombre) { toast('ID y Nombre son requeridos', 'error'); return; }
+    try {
+      const res = await fetch(`${API}/api/sucursal/`, {
+        method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data)
+      });
+      if (res.status === 201) { toast('Sucursal creada exitosamente', 'success'); clearSucursalForm(); loadSucursales(); }
+      else { const err = await res.json(); toast(`Error: ${err.error || res.status}`, 'error'); }
+    } catch (e) { toast('No se pudo conectar a la API', 'error'); }
+  }
+
+  async function getSucursalById() {
+    const id = document.getElementById('s-search-id').value;
+    if (!id) { toast('Ingresa un ID', 'error'); return; }
+    try {
+      const res = await fetch(`${API}/api/sucursal/${id}/`);
+      const div = document.getElementById('sucursal-detail');
+      if (res.status === 404) { div.innerHTML = `<div class="empty-state"><div class="icon">🔍</div><p>Sucursal ID ${id} no encontrada</p></div>`; return; }
+      const s = await res.json();
+      div.innerHTML = `
+        <div style="background:var(--surface2);border-radius:10px;padding:16px;border:1px solid var(--border);margin-top:4px">
+          <div style="font-family:'Syne',sans-serif;font-weight:700;margin-bottom:12px;font-size:15px">${s.nombre}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;color:var(--text-muted)">
+            <div>ID: <span style="color:var(--text)">${s.idsucursal}</span></div>
+            <div>Estado: <span style="color:var(--text)">${s.estado || '—'}</span></div>
+            <div>Calle: <span style="color:var(--text)">${(s.calle || '') + ' ' + (s.numexterior || '')}</span></div>
+            <div>Colonia: <span style="color:var(--text)">${s.colonia || '—'}</span></div>
+          </div>
+        </div>`;
+    } catch (e) { toast('Error al conectar con la API', 'error'); }
+  }
+
+  async function deleteSucursal() {
+    const id = document.getElementById('s-search-id').value;
+    if (!id) { toast('Ingresa un ID', 'error'); return; }
+    if (!confirm(`¿Eliminar sucursal ID ${id}?`)) return;
+    try {
+      const res = await fetch(`${API}/api/sucursal/${id}/`, { method: 'DELETE' });
+      if (res.status === 204) { toast(`Sucursal ${id} eliminada`, 'success'); loadSucursales(); document.getElementById('sucursal-detail').innerHTML = ''; }
+      else if (res.status === 404) { toast('Sucursal no encontrada', 'error'); }
+      else { toast(`Error: ${res.status}`, 'error'); }
+    } catch (e) { toast('Error al conectar con la API', 'error'); }
+  }
+
+  async function openEditSucursal(id) {
+    try {
+      const res = await fetch(`${API}/api/sucursal/${id}/`);
+      const s = await res.json();
+      editingSucursalId = id;
+      document.getElementById('e-s-nombre').value = s.nombre || '';
+      document.getElementById('e-s-calle').value = s.calle || '';
+      document.getElementById('e-s-numext').value = s.numexterior || '';
+      document.getElementById('e-s-numint').value = s.numinterior || '';
+      document.getElementById('e-s-colonia').value = s.colonia || '';
+      document.getElementById('e-s-estado').value = s.estado || '';
+      openModal('modal-sucursal');
+    } catch (e) { toast('Error al cargar sucursal', 'error'); }
+  }
+
+  async function updateSucursal() {
+    const data = {
+      nombre: document.getElementById('e-s-nombre').value,
+      calle: document.getElementById('e-s-calle').value || null,
+      numexterior: document.getElementById('e-s-numext').value || null,
+      numinterior: document.getElementById('e-s-numint').value || null,
+      colonia: document.getElementById('e-s-colonia').value || null,
+      estado: document.getElementById('e-s-estado').value || null,
+    };
+    try {
+      const res = await fetch(`${API}/api/sucursal/${editingSucursalId}/`, {
+        method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data)
+      });
+      if (res.ok) { toast('Sucursal actualizada correctamente', 'success'); closeModal('modal-sucursal'); loadSucursales(); }
+      else { const err = await res.json(); toast(`Error: ${err.error || res.status}`, 'error'); }
+    } catch (e) { toast('Error al conectar con la API', 'error'); }
+  }
+
+  function clearSucursalForm() {
+    ['s-id','s-nombre','s-calle','s-numext','s-numint','s-colonia','s-estado'].forEach(id => document.getElementById(id).value = '');
+  }
+
+  // ── Init ──────────────────────────────────────────────
+  loadClientes();
+</script>
+</body>
+</html>
