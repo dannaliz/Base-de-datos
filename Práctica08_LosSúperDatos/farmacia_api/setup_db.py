@@ -22,11 +22,11 @@ def ejecutar_sql(cursor, nombre_archivo):
                     print(f"Aviso en {nombre_archivo}: {e}")
 
 try:
-    # Escribimos los datos aquí para que NO dependa del .env por ahora
+
     conn = psycopg2.connect(
         dbname="farmacia",
         user="postgres",
-        password="0130",  # Tu contraseña real
+        password="0130",  
         host="localhost",
         port="5432"
     )

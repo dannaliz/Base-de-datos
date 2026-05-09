@@ -143,7 +143,7 @@ farmacia_api/
 └── sucursal/
     ├── __init__.py
     ├── apps.py
-    ├── queries.py               # SQL con Psycopg2 (CRUD MEDICAMENTO)
+    ├── queries.py               # SQL con Psycopg2 (CRUD SUCURSAL)
     ├── views.py                 # Vistas REST (APIView)
     └── urls.py
   
