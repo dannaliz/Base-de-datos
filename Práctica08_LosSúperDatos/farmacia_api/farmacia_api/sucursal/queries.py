@@ -18,9 +18,8 @@ def get_all_sucursales():
     finally:
         conn.close()
 
-# ---------------------------------------------------------------------------
+
 # READ — obtener una sucursal por ID
-# ---------------------------------------------------------------------------
 def get_sucursal_by_id(id_sucursal):
     conn = get_connection()
     try:
@@ -32,9 +31,8 @@ def get_sucursal_by_id(id_sucursal):
     finally:
         conn.close()
 
-# ---------------------------------------------------------------------------
+
 # CREATE — insertar una nueva sucursal
-# ---------------------------------------------------------------------------
 def create_sucursal(data):
     conn = get_connection()
     try:
@@ -63,9 +61,8 @@ def create_sucursal(data):
     finally:
         conn.close()
 
-# ---------------------------------------------------------------------------
+
 # UPDATE — actualizar una sucursal
-# ---------------------------------------------------------------------------
 def update_sucursal(id_sucursal, data):
     conn = get_connection()
     try:
@@ -93,9 +90,8 @@ def update_sucursal(id_sucursal, data):
     finally:
         conn.close()
 
-# ---------------------------------------------------------------------------
+
 # DELETE — eliminar sucursal
-# ---------------------------------------------------------------------------
 def delete_sucursal(id_sucursal):
     conn = get_connection()
     try:

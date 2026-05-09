@@ -25,21 +25,11 @@ class ClienteListView(APIView):
     """
     Vista para listar todos los clientes y crear un nuevo cliente.
 
-    Methods:
-        get:  Retorna la lista completa de clientes.
-        post: Inserta un nuevo cliente en la base de datos.
     """
 
     def get(self, request):
         """
         Retorna todos los registros de la tabla CLIENTE.
-
-        Args:
-            request (Request): Objeto de petición HTTP de DRF.
-
-        Returns:
-            Response: JSON con la lista de clientes y HTTP 200,
-                o HTTP 500 si ocurre un error de base de datos.
         """
         try:
             clientes = queries.get_all_clientes()
@@ -60,13 +50,6 @@ class ClienteListView(APIView):
             - ``apellidopaterno`` (str)
             - ``apellidomaterno`` (str)
 
-        Args:
-            request (Request): Objeto de petición HTTP de DRF con ``data``
-                en formato JSON.
-
-        Returns:
-            Response: JSON con los datos del cliente creado y HTTP 201,
-                HTTP 409 si el ID ya existe, o HTTP 500 en otro error.
         """
         try:
             nuevo = queries.create_cliente(request.data)
@@ -87,23 +70,12 @@ class ClienteDetailView(APIView):
     """
     Vista para obtener, actualizar o eliminar un cliente específico.
 
-    Methods:
-        get:    Retorna el cliente con el IDCliente indicado.
-        put:    Actualiza todos los campos del cliente indicado.
-        delete: Elimina el cliente con el IDCliente indicado.
     """
 
     def get(self, request, id_cliente):
         """
         Retorna el cliente cuyo IDCliente coincide con el parámetro de URL.
 
-        Args:
-            request (Request): Objeto de petición HTTP de DRF.
-            id_cliente (int): Identificador del cliente, tomado de la URL.
-
-        Returns:
-            Response: JSON con los datos del cliente y HTTP 200,
-                HTTP 404 si no existe, o HTTP 500 en error de BD.
         """
         try:
             cliente = queries.get_cliente_by_id(id_cliente)
@@ -126,13 +98,6 @@ class ClienteDetailView(APIView):
         El cuerpo de la petición debe contener todos los campos
         actualizables del cliente en formato JSON.
 
-        Args:
-            request (Request): Objeto de petición HTTP de DRF con ``data``.
-            id_cliente (int): Identificador del cliente a actualizar.
-
-        Returns:
-            Response: JSON con mensaje de éxito y HTTP 200,
-                HTTP 404 si no existe, o HTTP 500 en error de BD.
         """
         try:
             actualizado = queries.update_cliente(id_cliente, request.data)
@@ -155,13 +120,6 @@ class ClienteDetailView(APIView):
         """
         Elimina el registro del cliente con el IDCliente indicado.
 
-        Args:
-            request (Request): Objeto de petición HTTP de DRF.
-            id_cliente (int): Identificador del cliente a eliminar.
-
-        Returns:
-            Response: HTTP 204 sin contenido si se eliminó correctamente,
-                HTTP 404 si no existe, o HTTP 500 en error de BD.
         """
         try:
             eliminado = queries.delete_cliente(id_cliente)

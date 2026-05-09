@@ -9,21 +9,18 @@ registradas en el proyecto.
 from pathlib import Path
 from decouple import config
 
-# ---------------------------------------------------------------------------
+
 # Rutas base
-# ---------------------------------------------------------------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# ---------------------------------------------------------------------------
+
 # Seguridad
-# ---------------------------------------------------------------------------
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-cambia-esto-en-produccion')
 DEBUG = config('DEBUG', default=True, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*').split(',')
 
-# ---------------------------------------------------------------------------
+
 # Aplicaciones instaladas
-# ---------------------------------------------------------------------------
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -36,9 +33,8 @@ INSTALLED_APPS = [
     'corsheaders',
 ]
 
-# ---------------------------------------------------------------------------
+
 # Middleware
-# ---------------------------------------------------------------------------
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -70,10 +66,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'farmacia_api.wsgi.application'
 
-# ---------------------------------------------------------------------------
+
 # Base de datos — PostgreSQL con Psycopg2
-# Configura tus credenciales en el archivo .env (ver .env.example)
-# ---------------------------------------------------------------------------
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -85,23 +79,19 @@ DATABASES = {
     }
 }
 
-# ---------------------------------------------------------------------------
 # Internacionalización
-# ---------------------------------------------------------------------------
 LANGUAGE_CODE = 'es-mx'
 TIME_ZONE = 'America/Mexico_City'
 USE_I18N = True
 USE_TZ = True
 
-# ---------------------------------------------------------------------------
+
 # Archivos estáticos
-# ---------------------------------------------------------------------------
 STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# ---------------------------------------------------------------------------
+
 # Django REST Framework
-# ---------------------------------------------------------------------------
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
