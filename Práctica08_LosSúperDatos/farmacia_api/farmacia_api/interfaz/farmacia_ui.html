@@ -581,16 +581,15 @@
 
 <header>
   <div class="logo">
-    <div class="logo-icon">💊</div>
+    <div class="logo-icon"></div>
     <div class="logo-text">Los<span>Súper</span>Datos</div>
   </div>
-  <div class="api-badge">API · localhost:8000</div>
 </header>
 
 <div class="container">
   <div class="tabs">
-    <button class="tab active" onclick="switchTab('clientes')">👤 Clientes</button>
-    <button class="tab" onclick="switchTab('sucursales')">🏥 Sucursales</button>
+    <button class="tab active" onclick="switchTab('clientes')"> Clientes</button>
+    <button class="tab" onclick="switchTab('sucursales')"> Sucursales</button>
   </div>
 
   <!-- ===================== CLIENTES ===================== -->
@@ -735,8 +734,8 @@
       <div class="card-body">
         <div class="id-search">
           <input type="number" id="c-search-id" placeholder="ID del cliente...">
-          <button class="btn btn-ghost" onclick="getClienteById()">🔍 Buscar</button>
-          <button class="btn btn-danger" onclick="deleteCliente()">🗑 Eliminar</button>
+          <button class="btn btn-ghost" onclick="getClienteById()"> Buscar</button>
+          <button class="btn btn-danger" onclick="deleteCliente()"> Eliminar</button>
         </div>
         <div id="cliente-detail"></div>
       </div>
@@ -828,8 +827,8 @@
       <div class="card-body">
         <div class="id-search">
           <input type="number" id="s-search-id" placeholder="ID de sucursal...">
-          <button class="btn btn-ghost" onclick="getSucursalById()">🔍 Buscar</button>
-          <button class="btn btn-danger" onclick="deleteSucursal()">🗑 Eliminar</button>
+          <button class="btn btn-ghost" onclick="getSucursalById()"> Buscar</button>
+          <button class="btn btn-danger" onclick="deleteSucursal()"> Eliminar</button>
         </div>
         <div id="sucursal-detail"></div>
       </div>
@@ -841,7 +840,7 @@
 <div class="modal-overlay" id="modal-cliente">
   <div class="modal">
     <div class="modal-header">
-      <div class="modal-title">✏️ Editar Cliente</div>
+      <div class="modal-title"> Editar Cliente</div>
       <button class="modal-close" onclick="closeModal('modal-cliente')">✕</button>
     </div>
     <div class="modal-body">
@@ -928,7 +927,7 @@
 <div class="modal-overlay" id="modal-sucursal">
   <div class="modal">
     <div class="modal-header">
-      <div class="modal-title">✏️ Editar Sucursal</div>
+      <div class="modal-title"> Editar Sucursal</div>
       <button class="modal-close" onclick="closeModal('modal-sucursal')">✕</button>
     </div>
     <div class="modal-body">
@@ -1050,7 +1049,8 @@
                 <td><span class="badge badge-${c.esclientefisico}">${c.esclientefisico ? 'Sí' : 'No'}</span></td>
                 <td><span class="badge badge-${c.espaciente}">${c.espaciente ? 'Sí' : 'No'}</span></td>
                 <td>
-                  <button class="btn btn-ghost btn-sm" onclick="openEditCliente(${c.idcliente})">✏️</button>
+                  <button class="btn btn-ghost btn-sm" onclick="openEditCliente(${c.idcliente})">Editar</button>
+                  <button class="btn btn-danger btn-sm" onclick="deleteClienteById(${c.idcliente})">Borrar</button>
                 </td>
               </tr>`).join('')}
           </tbody>
@@ -1138,6 +1138,16 @@
       else if (res.status === 404) { toast('Cliente no encontrado', 'error'); }
       else { toast(`Error al eliminar: ${res.status}`, 'error'); }
     } catch (e) { toast('Error al conectar con la API', 'error'); }
+  }
+
+  async function deleteClienteById(id) {
+    if (!confirm(`¿Eliminar cliente ID ${id}? Esta acción no se puede deshacer.`)) return;
+    try {
+      const res = await fetch(`${API}/api/clientes/${id}/`, { method: 'DELETE' });
+      if (res.status === 204) { toast(`Cliente ${id} eliminado`, 'success'); loadClientes(); }
+      else if (res.status === 404) { toast('Cliente no encontrado', 'error'); }
+      else { toast('Error al eliminar', 'error'); }
+    } catch(e) { toast('Error de conexión', 'error'); }
   }
 
   async function openEditCliente(id) {
@@ -1235,7 +1245,7 @@
                 <td>${(s.calle || '') + ' ' + (s.numexterior || '')}</td>
                 <td>${s.colonia || '—'}</td>
                 <td>${s.estado || '—'}</td>
-                <td><button class="btn btn-ghost btn-sm" onclick="openEditSucursal(${s.idsucursal})">✏️</button></td>
+                <td><button class="btn btn-ghost btn-sm" onclick="openEditSucursal(${s.idsucursal})"></button>editar <button class="btn btn-danger btn-sm" onclick="deleteSucursalById(${s.idsucursal})">borrar</button></td>
               </tr>`).join('')}
           </tbody>
         </table>
@@ -1301,6 +1311,16 @@
       else if (res.status === 404) { toast('Sucursal no encontrada', 'error'); }
       else { toast(`Error: ${res.status}`, 'error'); }
     } catch (e) { toast('Error al conectar con la API', 'error'); }
+  }
+
+  async function deleteSucursalById(id) {
+    if (!confirm(`¿Eliminar sucursal ID ${id}?`)) return;
+    try {
+      const res = await fetch(`${API}/api/sucursal/${id}/`, { method: 'DELETE' });
+      if (res.status === 204) { toast(`Sucursal ${id} eliminada`, 'success'); loadSucursales(); }
+      else if (res.status === 404) { toast('Sucursal no encontrada', 'error'); }
+      else { toast('Error al eliminar', 'error'); }
+    } catch(e) { toast('Error de conexión', 'error'); }
   }
 
   async function openEditSucursal(id) {
