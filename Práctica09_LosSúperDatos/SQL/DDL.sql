@@ -34,6 +34,47 @@
 --      (NOT NULL y CHECK) en varias tablas.
 -- ============================================================
 
+-- ============================================================
+--  Limpieza del esquema
+--  Permite ejecutar este DDL desde cero aunque ya existan tablas.
+-- ============================================================
+DROP TABLE IF EXISTS
+    GENERAR_CONSULTA_RECETA,
+    PEDIR,
+    RECETA_MEDICA,
+    CONSULTA,
+    COMPRAR,
+    TICKET,
+    UTILIZAR,
+    USAR,
+    PREPARAR,
+    PROVEER_INSUMO,
+    PROVEER_MEDICAMENTO,
+    MEDICAMENTO,
+    TELEFONO_SUCURSAL,
+    HORARIO_CLINICA,
+    CLINICA,
+    FARMACEUTICO,
+    CUIDADOR,
+    LIMPIEZA,
+    CAJERO,
+    ENFERMERA,
+    MEDICO,
+    TELEFONO_PERSONAL,
+    CORREO_PERSONAL,
+    HORARIO_PERSONAL,
+    INSUMO,
+    TELEFONO_PROVEEDOR,
+    CORREO_CLIENTE,
+    TELEFONO_CLIENTE,
+    PERSONAL,
+    PROVEEDOR,
+    SUCURSAL,
+    CLIENTE,
+    GENERAR,
+    TENER
+CASCADE;
+
 CREATE TABLE CLIENTE (
     IDCliente       INT,
     Nombre          VARCHAR(80),
