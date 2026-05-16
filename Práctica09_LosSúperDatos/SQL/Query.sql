@@ -1,5 +1,6 @@
 -- Consulta i
-
+-- Mostrar el nombre completo de todos los clientes, junto con su nombre de usuario (en dado caso que se tenga
+-- una cuenta).
 SELECT
     C.IDCliente,
     CONCAT(C.Nombre, ' ', C.ApellidoPaterno, ' ', C.ApellidoMaterno) AS NombreCompleto,
@@ -8,7 +9,7 @@ FROM CLIENTE AS C
 ORDER BY C.IDCliente;
 
 -- Consulta ii
-
+-- Calcular cuántos medicamentos ha comprado cada cliente.
 SELECT
     C.IDCliente,
     CONCAT(C.Nombre, ' ', C.ApellidoPaterno, ' ', C.ApellidoMaterno) AS NombreCompleto,
@@ -26,6 +27,7 @@ GROUP BY
 ORDER BY TotalMedicamentosComprados DESC;
 
 -- Consulta iii
+-- Listar todos las enfermeras cuyo apellido materno contenga llo.
 SELECT
     P.IDPersonal,
     CONCAT(P.Nombre, ' ', P.ApellidoPaterno, ' ', P.ApellidoMaterno) AS NombreCompleto,
@@ -39,6 +41,8 @@ WHERE P.ApellidoMaterno ILIKE '%llo%'
 ORDER BY P.ApellidoMaterno;
 
 -- Consulta iv
+-- Obtener la lista de los clientes que hayan comprado en alguna sucursal pero que no hayan recibido alguna
+-- consulta.
 SELECT DISTINCT
     C.IDCliente,
     CONCAT(C.Nombre, ' ', C.ApellidoPaterno, ' ', C.ApellidoMaterno) AS NombreCompleto,

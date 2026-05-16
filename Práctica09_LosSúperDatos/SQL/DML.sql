@@ -8150,3 +8150,138 @@ SELECT
     g
 FROM generate_series(1, 300) AS gs(g);
 
+-- REGISTROS PARA QUE LAS CONSULTAS QUE NECESITAN RESULTADOS ESPECIFICOS QUE NO MOSTRABAN ANTES
+
+-- Consulta iii: 10 enfermeros con ApellidoMaterno que contiene 'llo'.
+INSERT INTO PERSONAL (IDPersonal, IDSucursal, Nombre, ApellidoPaterno, ApellidoMaterno, CedulaProfesional, RFC, Calle, NumExterior, NumInterior, Colonia, Estado, Salario)
+SELECT
+    1000 + g,
+    ((g - 1) % 10) + 1,
+    'EnfermeroConsulta' || g,
+    'Prueba',
+    'Castillo',
+    (80000000 + g)::text,
+    'ENFQ260507A' || LPAD(g::text, 2, '0'),
+    'Calle Consulta III',
+    g::text,
+    NULL,
+    'Centro',
+    'Ciudad de Mexico',
+    18000 + (g * 100)
+FROM generate_series(1, 10) AS gs(g);
+
+INSERT INTO ENFERMERA (IDPersonal, CertificadoReanimacion, TipoProcedimiento)
+SELECT
+    1000 + g,
+    CASE WHEN g % 2 = 0 THEN 'Avanzado' ELSE 'Basico' END,
+    'Apoyo en consulta'
+FROM generate_series(1, 10) AS gs(g);
+
+-- Consulta x: 10 sucursales con al menos 5 medicos cada una.
+INSERT INTO PERSONAL (IDPersonal, IDSucursal, Nombre, ApellidoPaterno, ApellidoMaterno, CedulaProfesional, RFC, Calle, NumExterior, NumInterior, Colonia, Estado, Salario)
+SELECT
+    1010 + g,
+    ((g - 1) / 5) + 1,
+    'MedicoSucursal' || g,
+    'Prueba',
+    'Morales',
+    (81000000 + g)::text,
+    'MEDQ260507' || LPAD(g::text, 3, '0'),
+    'Calle Consulta X',
+    g::text,
+    NULL,
+    'Centro',
+    'Ciudad de Mexico',
+    32000 + (g * 150)
+FROM generate_series(1, 50) AS gs(g);
+
+INSERT INTO MEDICO (IDPersonal, Especialidad, InstitucionEgreso, VigenciaCertificacion)
+SELECT
+    1010 + g,
+    CASE
+        WHEN g % 4 = 0 THEN 'Medicina General'
+        WHEN g % 4 = 1 THEN 'Pediatria'
+        WHEN g % 4 = 2 THEN 'Dermatologia'
+        ELSE 'Geriatria'
+    END,
+    'Universidad de Datos',
+    CURRENT_DATE + 365 + g
+FROM generate_series(1, 50) AS gs(g);
+
+-- Consulta iv: 10 clientes con compras pero sin consulta.
+INSERT INTO TICKET (IDTicket, IDSucursal, IDCliente)
+SELECT
+    300 + g,
+    ((g - 1) % 10) + 1,
+    300 + g
+FROM generate_series(1, 10) AS gs(g);
+
+INSERT INTO COMPRAR (IDTicket, IDMedicamento, Cantidad)
+SELECT
+    300 + g,
+    g,
+    1 + (g % 3)
+FROM generate_series(1, 10) AS gs(g);
+
+-- Consulta viii: 10 consultas el 7 de mayo de 2026 entre 12:00 y 16:00.
+INSERT INTO TICKET (IDTicket, IDSucursal, IDCliente)
+SELECT
+    310 + g,
+    ((g - 1) % 10) + 1,
+    g
+FROM generate_series(1, 10) AS gs(g);
+
+INSERT INTO COMPRAR (IDTicket, IDMedicamento, Cantidad)
+SELECT
+    310 + g,
+    10 + g,
+    1
+FROM generate_series(1, 10) AS gs(g);
+
+INSERT INTO CONSULTA (IDConsulta, IDCliente, IDMedico, IDEnfermera, IDClinica, IDTicket, Fecha, Hora, Diagnostico, CostoConsulta)
+SELECT
+    300 + g,
+    g,
+    1010 + g,
+    1000 + g,
+    ((g - 1) % 10) + 1,
+    310 + g,
+    DATE '2026-05-07',
+    (TIME '12:00' + ((g - 1) % 5) * INTERVAL '1 hour')::time,
+    'Consulta programada para validacion de consulta viii',
+    450 + (g * 10)
+FROM generate_series(1, 10) AS gs(g);
+
+INSERT INTO RECETA_MEDICA (NumeroReceta, FechaNacimiento, Peso, Talla, Alergias, Diagnostico, Consultorio, Turno)
+SELECT
+    300 + g,
+    DATE '1990-01-01' + (g * 30),
+    60 + g,
+    1.60 + (g / 100.0),
+    'Ninguna',
+    'Consulta programada para validacion de consulta viii',
+    'Consultorio ' || g,
+    CASE WHEN g <= 5 THEN 'Matutino' ELSE 'Vespertino' END
+FROM generate_series(1, 10) AS gs(g);
+
+INSERT INTO GENERAR_CONSULTA_RECETA (IDConsulta, NumeroReceta)
+SELECT
+    300 + g,
+    300 + g
+FROM generate_series(1, 10) AS gs(g);
+
+-- Consulta xi: 10 sucursales con mas de 3 medicamentos distintos vendidos.
+INSERT INTO TICKET (IDTicket, IDSucursal, IDCliente)
+SELECT
+    320 + g,
+    ((g - 1) / 4) + 1,
+    ((g - 1) % 300) + 1
+FROM generate_series(1, 40) AS gs(g);
+
+INSERT INTO COMPRAR (IDTicket, IDMedicamento, Cantidad)
+SELECT
+    320 + g,
+    ((g - 1) % 4) + 1,
+    1 + (g % 2)
+FROM generate_series(1, 40) AS gs(g);
+
