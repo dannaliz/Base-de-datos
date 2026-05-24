@@ -299,7 +299,9 @@ CREATE TABLE UTILIZAR (
 CREATE TABLE TICKET (
     IDTicket   INT,
     IDSucursal INT,
-    IDCliente  INT
+    IDCliente  INT,
+    Fecha DATE,
+    Hora TIME
 );
 
 -- 28  COMPRAR (relación M:N entre TICKET y MEDICAMENTO, ahora con Cantidad)

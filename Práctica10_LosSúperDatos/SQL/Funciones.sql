@@ -1,56 +1,61 @@
-create or replace function reconoceredad(p_idCliente INT)
-returns INT
-as $$
-declare
-	fecha_hoy DATE;
-	fechaNacimiento DATE;
-	edad INT;
+-- Funcion que recibe el identificador del cliente y regresa su edad.
+CREATE OR REPLACE FUNCTION reconoceredad(p_idCliente INT)
+RETURNS INT
+AS $$
+DECLARE
+    v_fecha_nacimiento DATE;
+BEGIN
+    SELECT c.FechaNacimiento
+      INTO v_fecha_nacimiento
+      FROM CLIENTE AS c
+     WHERE c.IDCliente = p_idCliente;
 
-begin
-	fecha_hoy  := CURRENT_DATE;
-	select c.fechaNacimiento
-	into fechaNacimiento
-	from Cliente as c
-	where c.idcliente = p_idcliente;
-	edad := DATE_PART('year', AGE(fecha_hoy, fechaNacimiento));
-	return edad;
-	
-end;
-$$ 
-language plpgsql;
+    IF v_fecha_nacimiento IS NULL THEN
+        RETURN NULL;
+    END IF;
 
-select reconoceredad(200);
-
-create or replace function calculaganancias(s_Nombre VARCHAR(120))
-returns numeric(12,2)
-as $$
-declare 
-	ganancia_medicamentos numeric(12,2);
-	ganancia_consultas numeric(12,2);
-
-begin
-	select coalesce(sum(m.PrecioPublico),0) --Esto lo hice para no tener problema en caso de haber nulls
-	into ganancia_medicamentos
-	from Sucursal as s
-	inner join Ticket as t on t.idSucursal = s.idSucursal
-	inner join Comprar as c on c.idTicket = t.idTicket
-	inner join Medicamento as m on m.idMedicamento = c.idMedicamento
-	where s.Nombre = s_Nombre;
-
-	select coalesce(sum(con.CostoConsulta),0) --Esto lo hice para no tener problema en caso de haber nulls
-	into ganancia_consultas
-	from Sucursal as s
-	inner join Clinica as cl on cl.idSucursal = s.idSucursal
-	inner join Consulta as con on con.idClinica = cl.idClinica
-	where s.Nombre = s_Nombre
-    and extract(year from con.Fecha) = 2026;
-
-	return ganancia_medicamentos + ganancia_consultas;
-	
-end;
+    RETURN DATE_PART('year', AGE(CURRENT_DATE, v_fecha_nacimiento))::INT;
+END;
 $$
-language plpgsql;
+LANGUAGE plpgsql;
 
-SELECT Nombre, calculaganancias(Nombre) --Esto para poder ver todas las sucursales y sus ganancias.
-FROM Sucursal;
+-- Ejemplo de ejecucion:
+-- SELECT reconoceredad(200);
 
+
+-- Funcion que recibe la sucursal y calcula sus ganancias durante el anio 2026.
+CREATE OR REPLACE FUNCTION calculaganancias(p_nombre_sucursal VARCHAR(120))
+RETURNS NUMERIC(12,2)
+AS $$
+DECLARE
+    v_ganancia_medicamentos NUMERIC(12,2);
+    v_ganancia_consultas    NUMERIC(12,2);
+BEGIN
+    SELECT COALESCE(SUM(m.PrecioPublico * c.Cantidad), 0)
+      INTO v_ganancia_medicamentos
+      FROM SUCURSAL AS s
+      JOIN TICKET AS t ON t.IDSucursal = s.IDSucursal
+      JOIN COMPRAR AS c ON c.IDTicket = t.IDTicket
+      JOIN MEDICAMENTO AS m ON m.IDMedicamento = c.IDMedicamento
+     WHERE s.Nombre = p_nombre_sucursal
+       AND EXTRACT(YEAR FROM t.Fecha) = 2026;
+
+    SELECT COALESCE(SUM(con.CostoConsulta), 0)
+      INTO v_ganancia_consultas
+      FROM SUCURSAL AS s
+      JOIN CLINICA AS cl ON cl.IDSucursal = s.IDSucursal
+      JOIN CONSULTA AS con ON con.IDClinica = cl.IDClinica
+     WHERE s.Nombre = p_nombre_sucursal
+       AND EXTRACT(YEAR FROM con.Fecha) = 2026;
+
+    RETURN v_ganancia_medicamentos + v_ganancia_consultas;
+END;
+$$
+LANGUAGE plpgsql;
+
+-- Ejemplo de ejecucion para una sucursal especifica:
+-- SELECT calculaganancias('Sucursal Los SuperDatos 001');
+
+-- Ejemplo de ejecucion para ver todas las sucursales y sus ganancias:
+-- SELECT Nombre, calculaganancias(Nombre)
+-- FROM SUCURSAL;
