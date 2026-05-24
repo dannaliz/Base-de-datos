@@ -31,8 +31,12 @@
 ALTER TABLE MEDICAMENTO
     ADD COLUMN IF NOT EXISTS Stock INT NOT NULL DEFAULT 0;
 
-ALTER TABLE MEDICAMENTO
-    ADD CONSTRAINT chk_stock_no_negativo CHECK (Stock >= 0);
+--  NOTA: No se agrega un CHECK (Stock >= 0) porque sp_eliminar_medicamento
+--  borra renglones de PREPARAR/COMPRAR/PROVEER_MEDICAMENTO y los triggers
+--  de stock se disparan en cascada, lo que podría dejar al stock
+--  temporalmente en negativo antes de que el medicamento desaparezca.
+--  La validación real ("no se puede vender más de lo que hay") la hace
+--  fn_stock_comprar al momento de la compra.
 
 ALTER TABLE TICKET
     ADD COLUMN IF NOT EXISTS Fecha              DATE          NOT NULL DEFAULT CURRENT_DATE;

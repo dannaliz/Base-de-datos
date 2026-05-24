@@ -37,13 +37,16 @@
 --      * Se inserta primero en PERSONAL y luego en FARMACEUTICO.
 --
 --  Salida:
---      Devuelve el IDPersonal recién asignado (parámetro OUT).
+--      Imprime el IDPersonal recién asignado vía RAISE NOTICE.
+--      Si se requiere capturarlo programáticamente, llamar al SP
+--      dentro de un bloque DO con una variable, o consultar
+--      MAX(IDPersonal) de la tabla PERSONAL.
 -- ============================================================
 
 DROP PROCEDURE IF EXISTS sp_registrar_farmaceutico(
     VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR,
     VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR,
-    DECIMAL, INT, INT
+    DECIMAL, INT
 );
 
 CREATE OR REPLACE PROCEDURE sp_registrar_farmaceutico(
@@ -58,12 +61,12 @@ CREATE OR REPLACE PROCEDURE sp_registrar_farmaceutico(
     IN  p_colonia           VARCHAR,
     IN  p_estado            VARCHAR,
     IN  p_salario           DECIMAL,
-    IN  p_id_sucursal       INT,
-    OUT p_id_personal       INT
+    IN  p_id_sucursal       INT
 )
 LANGUAGE plpgsql
 AS $$
 DECLARE
+    v_id_personal  INT;
     --  Expresión regular que solo admite letras (mayúsculas y
     --  minúsculas), acentos del español, la letra ñ/Ñ y espacios.
     --  Cualquier dígito o símbolo provoca un error.
@@ -120,9 +123,13 @@ BEGIN
 
     -- ------------------------------------------------------------
     -- 3)  Calcular el nuevo IDPersonal
+    --     Usamos un bloqueo ligero para evitar carreras al
+    --     calcular MAX+1 si varias sesiones registran a la vez.
     -- ------------------------------------------------------------
+    LOCK TABLE PERSONAL IN SHARE ROW EXCLUSIVE MODE;
+
     SELECT COALESCE(MAX(IDPersonal), 0) + 1
-      INTO p_id_personal
+      INTO v_id_personal
       FROM PERSONAL;
 
     -- ------------------------------------------------------------
@@ -136,7 +143,7 @@ BEGIN
         Salario
     )
     VALUES (
-        p_id_personal, p_id_sucursal,
+        v_id_personal, p_id_sucursal,
         p_nombre, p_apellido_paterno, p_apellido_materno,
         p_cedula, p_rfc,
         p_calle, p_num_ext, p_num_int, p_colonia, p_estado,
@@ -146,9 +153,9 @@ BEGIN
     -- ------------------------------------------------------------
     -- 5)  Insertar en la especialización FARMACEUTICO
     -- ------------------------------------------------------------
-    INSERT INTO FARMACEUTICO (IDPersonal) VALUES (p_id_personal);
+    INSERT INTO FARMACEUTICO (IDPersonal) VALUES (v_id_personal);
 
-    RAISE NOTICE 'Farmacéutico registrado con IDPersonal = %.', p_id_personal;
+    RAISE NOTICE 'Farmacéutico registrado con IDPersonal = %.', v_id_personal;
 END;
 $$;
 
@@ -248,9 +255,10 @@ $$;
 --      'Av. Insurgentes',
 --      '123', NULL, 'Centro', 'Ciudad de México',
 --      12500.50,         -- salario
---      1,                -- IDSucursal
---      NULL              -- OUT IDPersonal
+--      1                 -- IDSucursal
 --  );
+--  -- El nuevo IDPersonal aparece en el NOTICE; también se puede
+--  -- recuperar con:  SELECT MAX(IDPersonal) FROM PERSONAL;
 --
 --  -- Eliminar un medicamento:
 --  CALL sp_eliminar_medicamento(42);
