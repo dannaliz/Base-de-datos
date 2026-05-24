@@ -16,15 +16,18 @@
 --       - DescuentoAplicado;
 --       - PrecioNeto.
 --
---  Nota:
---  El DDL base no incluye todas las columnas necesarias para
---  estos triggers. Por eso este script agrega columnas auxiliares
---  con ALTER TABLE ... ADD COLUMN IF NOT EXISTS.
+--  Orden recomendado de ejecucion:
+--      1. DDL.sql
+--      2. Trigger.sql
+--      3. DML.sql
+--
+--  Los atributos que usan los triggers ya deben existir desde
+--  DDL.sql. Este archivo solo define funciones y disparadores.
 -- ============================================================
 
 
 -- ============================================================
---  0) Columnas auxiliares
+--  0) Columnas usadas por estos triggers
 -- ============================================================
 --  MEDICAMENTO.Stock:
 --      Guarda el inventario disponible por medicamento.
@@ -39,25 +42,9 @@
 --      Total final despues de aplicar el descuento.
 --
 --  TICKET.Fecha:
---      Ya existe en el DDL actual, pero se deja IF NOT EXISTS para
---      que el script siga funcionando si se ejecuta sobre una version
---      anterior del esquema.
+--      Se usa para saber cuantos tickets previos existen en el mismo
+--      anio y asi calcular el descuento.
 -- ============================================================
-
-ALTER TABLE MEDICAMENTO
-    ADD COLUMN IF NOT EXISTS Stock INT NOT NULL DEFAULT 0;
-
-ALTER TABLE TICKET
-    ADD COLUMN IF NOT EXISTS Fecha DATE NOT NULL DEFAULT CURRENT_DATE;
-
-ALTER TABLE TICKET
-    ADD COLUMN IF NOT EXISTS PrecioBruto DECIMAL(12,2) NOT NULL DEFAULT 0;
-
-ALTER TABLE TICKET
-    ADD COLUMN IF NOT EXISTS PrecioNeto DECIMAL(12,2) NOT NULL DEFAULT 0;
-
-ALTER TABLE TICKET
-    ADD COLUMN IF NOT EXISTS DescuentoAplicado DECIMAL(5,2) NOT NULL DEFAULT 0;
 
 
 -- ============================================================

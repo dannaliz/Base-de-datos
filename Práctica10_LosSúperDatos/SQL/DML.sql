@@ -7694,6 +7694,8 @@ VALUES (751),
 (900);
 
 -- INSERTAR DATOS EN MEDICAMENTO
+-- Stock no se inserta explicitamente: inicia en DEFAULT 0 desde DDL.sql
+-- y despues Trigger.sql lo actualiza con PROVEER_MEDICAMENTO, PREPARAR y COMPRAR.
 INSERT INTO MEDICAMENTO (IDMedicamento, PrecioPublico, PrecioUnitario, MedicamentosEsteriles, Preparaciones, Formulacion, PreparadosOficiales, Pediatrica, Dermatologica)
 VALUES (1, 526.64, 59, true, 'Nam ultrices, libero non mattis pulvinar, nulla pede ullamcorper augue, a suscipit nulla elit ac nulla. Sed vel enim sit amet nunc viverra dapibus.', 'Etiam justo.', true, false, false),
 (2, 770.09, 81, true, 'Duis consequat dui nec nisi volutpat eleifend. Donec ut dolor.', 'Proin interdum mauris non ligula pellentesque ultrices. Phasellus id sapien in sapien iaculis congue.', true, true, false),
@@ -8066,13 +8068,16 @@ JOIN (
     ON i.rn = ((g - 1) % 200) + 1;
 
 -- INSERTAR DATOS EN TICKET
-INSERT INTO TICKET (IDTicket, IDSucursal, IDCliente, Fecha, Hora)
+INSERT INTO TICKET (IDTicket, IDSucursal, IDCliente, Fecha, Hora, PrecioBruto, PrecioNeto, DescuentoAplicado)
 SELECT
     g,
     ((g * 7 - 1) % 180) + 1,
     ((g - 1) % 500) + 1,
     DATE '2026-05-15' + (g % 180),
-    (TIME '08:00' + (((g - 1) % 10) * INTERVAL '1 hour'))::time
+    (TIME '08:00' + (((g - 1) % 10) * INTERVAL '1 hour'))::time,
+    0,
+    0,
+    0
 FROM generate_series(1, 300) AS gs(g);
 
 -- INSERTAR DATOS EN COMPRAR
@@ -8211,13 +8216,16 @@ SELECT
 FROM generate_series(1, 50) AS gs(g);
 
 -- Consulta iv: 10 clientes con compras pero sin consulta.
-INSERT INTO TICKET (IDTicket, IDSucursal, IDCliente, Fecha, Hora)
+INSERT INTO TICKET (IDTicket, IDSucursal, IDCliente, Fecha, Hora, PrecioBruto, PrecioNeto, DescuentoAplicado)
 SELECT
     300 + g,
     ((g - 1) % 10) + 1,
     300 + g,
     DATE '2026-06-01' + (g - 1),
-    (TIME '09:00' + ((g - 1) % 8) * INTERVAL '1 hour')::time
+    (TIME '09:00' + ((g - 1) % 8) * INTERVAL '1 hour')::time,
+    0,
+    0,
+    0
 FROM generate_series(1, 10) AS gs(g);
 
 INSERT INTO COMPRAR (IDTicket, IDMedicamento, Cantidad)
@@ -8228,13 +8236,16 @@ SELECT
 FROM generate_series(1, 10) AS gs(g);
 
 -- Consulta viii: 10 consultas el 7 de mayo de 2026 entre 12:00 y 16:00.
-INSERT INTO TICKET (IDTicket, IDSucursal, IDCliente, Fecha, Hora)
+INSERT INTO TICKET (IDTicket, IDSucursal, IDCliente, Fecha, Hora, PrecioBruto, PrecioNeto, DescuentoAplicado)
 SELECT
     310 + g,
     ((g - 1) % 10) + 1,
     g,
     DATE '2026-05-07',
-    (TIME '12:00' + ((g - 1) % 5) * INTERVAL '1 hour')::time
+    (TIME '12:00' + ((g - 1) % 5) * INTERVAL '1 hour')::time,
+    0,
+    0,
+    0
 FROM generate_series(1, 10) AS gs(g);
 
 INSERT INTO COMPRAR (IDTicket, IDMedicamento, Cantidad)
@@ -8277,13 +8288,16 @@ SELECT
 FROM generate_series(1, 10) AS gs(g);
 
 -- Consulta xi: 10 sucursales con mas de 3 medicamentos distintos vendidos.
-INSERT INTO TICKET (IDTicket, IDSucursal, IDCliente, Fecha, Hora)
+INSERT INTO TICKET (IDTicket, IDSucursal, IDCliente, Fecha, Hora, PrecioBruto, PrecioNeto, DescuentoAplicado)
 SELECT
     320 + g,
     ((g - 1) / 4) + 1,
     ((g - 1) % 300) + 1,
     DATE '2026-07-01' + ((g - 1) % 10),
-    (TIME '10:00' + ((g - 1) % 6) * INTERVAL '1 hour')::time
+    (TIME '10:00' + ((g - 1) % 6) * INTERVAL '1 hour')::time,
+    0,
+    0,
+    0
 FROM generate_series(1, 40) AS gs(g);
 
 INSERT INTO COMPRAR (IDTicket, IDMedicamento, Cantidad)

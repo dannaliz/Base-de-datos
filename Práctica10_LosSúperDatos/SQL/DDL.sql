@@ -251,7 +251,8 @@ CREATE TABLE MEDICAMENTO (
     Formulacion           TEXT,
     PreparadosOficiales   BOOLEAN,
     Pediatrica            BOOLEAN,
-    Dermatologica         BOOLEAN
+    Dermatologica         BOOLEAN,
+    Stock                 INT DEFAULT 0
 );
 
 -- 22  PROVEER_MEDICAMENTO (relación ternaria)
@@ -297,11 +298,14 @@ CREATE TABLE UTILIZAR (
 
 -- 27  TICKET  (se eliminó IDConsulta; la relación se cierra desde CONSULTA.IDTicket)
 CREATE TABLE TICKET (
-    IDTicket   INT,
-    IDSucursal INT,
-    IDCliente  INT,
-    Fecha DATE,
-    Hora TIME
+    IDTicket          INT,
+    IDSucursal        INT,
+    IDCliente         INT,
+    Fecha             DATE DEFAULT CURRENT_DATE,
+    Hora              TIME,
+    PrecioBruto       DECIMAL(12,2) DEFAULT 0,
+    PrecioNeto        DECIMAL(12,2) DEFAULT 0,
+    DescuentoAplicado DECIMAL(5,2) DEFAULT 0
 );
 
 -- 28  COMPRAR (relación M:N entre TICKET y MEDICAMENTO, ahora con Cantidad)
@@ -403,6 +407,16 @@ CHECK (VigenciaCertificacion >= CURRENT_DATE);
 
 ALTER TABLE MEDICAMENTO ADD CONSTRAINT CHK_Precio
 CHECK (PrecioPublico >= 0 AND PrecioUnitario >= 0);
+ALTER TABLE MEDICAMENTO ALTER COLUMN Stock SET NOT NULL;
+
+ALTER TABLE TICKET ALTER COLUMN Fecha SET NOT NULL;
+ALTER TABLE TICKET ALTER COLUMN PrecioBruto SET NOT NULL;
+ALTER TABLE TICKET ALTER COLUMN PrecioNeto SET NOT NULL;
+ALTER TABLE TICKET ALTER COLUMN DescuentoAplicado SET NOT NULL;
+ALTER TABLE TICKET ADD CONSTRAINT chk_ticket_precios
+CHECK (PrecioBruto >= 0 AND PrecioNeto >= 0);
+ALTER TABLE TICKET ADD CONSTRAINT chk_ticket_descuento
+CHECK (DescuentoAplicado >= 0 AND DescuentoAplicado <= 100);
 
 ALTER TABLE CONSULTA ALTER COLUMN Fecha SET NOT NULL;
 ALTER TABLE CONSULTA ALTER COLUMN Hora SET NOT NULL;
@@ -777,6 +791,7 @@ COMMENT ON TABLE TELEFONO_SUCURSAL IS 'Atributo multivaluado: teléfonos asociad
 
 COMMENT ON TABLE INSUMO IS 'Almacena los insumos utilizados en la clínica o farmacia. La fecha de caducidad se registra en PROVEER_INSUMO.';
 COMMENT ON TABLE MEDICAMENTO IS 'Almacena los medicamentos manejados por la farmacia o clínica. La fecha de caducidad, el proveedor, el preparador y los insumos asociados se gestionan en sus tablas de relación.';
+COMMENT ON COLUMN MEDICAMENTO.Stock IS 'Inventario disponible del medicamento; se actualiza mediante triggers.';
 
 COMMENT ON TABLE MEDICO IS 'Especialización del personal que desempeña el rol de médico.';
 COMMENT ON COLUMN MEDICO.InstitucionEgreso IS 'Institución educativa de la cual egresó el médico.';
@@ -798,6 +813,9 @@ COMMENT ON TABLE PREPARAR IS 'Relación M:N: registra qué personal (farmacéuti
 COMMENT ON TABLE USAR IS 'Relación M:N: registra qué personal (farmacéutico) utiliza qué insumos.';
 COMMENT ON TABLE UTILIZAR IS 'Relación M:N: registra qué insumos (sustancia activa) compone cada medicamento.';
 COMMENT ON TABLE TICKET IS 'Almacena los tickets generados por compras o servicios.';
+COMMENT ON COLUMN TICKET.PrecioBruto IS 'Total del ticket antes de aplicar descuento; se recalcula mediante triggers.';
+COMMENT ON COLUMN TICKET.PrecioNeto IS 'Total del ticket despues de aplicar descuento; se recalcula mediante triggers.';
+COMMENT ON COLUMN TICKET.DescuentoAplicado IS 'Porcentaje de descuento aplicado al ticket segun tickets previos del mismo anio.';
 COMMENT ON TABLE COMPRAR IS 'Relación M:N: registra los medicamentos incluidos dentro de un ticket, con la cantidad adquirida.';
 COMMENT ON COLUMN COMPRAR.Cantidad IS 'Cantidad de unidades del medicamento adquiridas en el ticket.';
 COMMENT ON TABLE CONSULTA IS 'Almacena la información de las consultas médicas realizadas.';
