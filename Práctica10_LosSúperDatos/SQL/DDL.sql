@@ -252,7 +252,7 @@ CREATE TABLE MEDICAMENTO (
     PreparadosOficiales   BOOLEAN,
     Pediatrica            BOOLEAN,
     Dermatologica         BOOLEAN,
-    Stock                 INT DEFAULT 0
+    Stock                 INT DEFAULT 100
 );
 
 -- 22  PROVEER_MEDICAMENTO (relación ternaria)
