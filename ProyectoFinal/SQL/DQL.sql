@@ -496,44 +496,43 @@ ORDER BY TotalClientes DESC;
 
 
 -- Consulta xx
--- Clientes que califican para descuento según el número
--- de tickets emitidos durante el año en curso.
--- Reglas de clasificación:
---   5 a 9   tickets en el año -> 5%
---   10 a 19 tickets en el año -> 10%
---   20 o más tickets en el año -> 25%
--- Solo se listan clientes que califican para algún descuento.
+-- Clientes con descuentos aplicados durante el año en curso.
+-- El descuento no se recalcula aqui: se lee desde TICKET.DescuentoAplicado,
+-- que es asignado por el trigger trg_ticket_set_descuento al insertar
+-- cada ticket y se usa despues para calcular TICKET.PrecioNeto.
 
-WITH TicketsCliente AS (
+WITH TicketsConDescuento AS (
     SELECT
-        C.IDCliente,
-        CONCAT(C.Nombre, ' ', C.ApellidoPaterno, ' ', C.ApellidoMaterno) AS NombreCompleto,
-        COUNT(T.IDTicket) FILTER (
-            WHERE EXTRACT(YEAR FROM T.Fecha) = EXTRACT(YEAR FROM CURRENT_DATE)
-        ) AS TicketsAnioActual
-    FROM CLIENTE AS C
-    LEFT JOIN TICKET AS T
-        ON C.IDCliente = T.IDCliente
-    GROUP BY
-        C.IDCliente,
-        C.Nombre,
-        C.ApellidoPaterno,
-        C.ApellidoMaterno
+        T.IDTicket,
+        T.IDCliente,
+        T.Fecha,
+        T.PrecioBruto,
+        T.DescuentoAplicado,
+        T.PrecioNeto
+    FROM TICKET AS T
+    WHERE EXTRACT(YEAR FROM T.Fecha) = EXTRACT(YEAR FROM CURRENT_DATE)
+      AND T.DescuentoAplicado > 0
 )
 SELECT
-    IDCliente,
-    NombreCompleto,
-    TicketsAnioActual,
-    CASE
-        WHEN TicketsAnioActual >= 20 THEN '25%'
-        WHEN TicketsAnioActual >= 10 THEN '10%'
-        WHEN TicketsAnioActual >= 5  THEN '5%'
-    END AS DescuentoQueCalifica
-FROM TicketsCliente
-WHERE TicketsAnioActual >= 5
+    C.IDCliente,
+    CONCAT(C.Nombre, ' ', C.ApellidoPaterno, ' ', C.ApellidoMaterno) AS NombreCompleto,
+    COUNT(TD.IDTicket) AS TicketsConDescuento,
+    MIN(TD.DescuentoAplicado) AS DescuentoMinimoAplicado,
+    MAX(TD.DescuentoAplicado) AS DescuentoMaximoAplicado,
+    ROUND(SUM(TD.PrecioBruto), 2) AS TotalBrutoConDescuento,
+    ROUND(SUM(TD.PrecioBruto - TD.PrecioNeto), 2) AS TotalDescontado,
+    ROUND(SUM(TD.PrecioNeto), 2) AS TotalNetoConDescuento
+FROM CLIENTE AS C
+INNER JOIN TicketsConDescuento AS TD
+    ON C.IDCliente = TD.IDCliente
+GROUP BY
+    C.IDCliente,
+    C.Nombre,
+    C.ApellidoPaterno,
+    C.ApellidoMaterno
 ORDER BY
-    TicketsAnioActual DESC,
-    IDCliente;
+    TotalDescontado DESC,
+    C.IDCliente;
 
 
 -- Consulta xxi
