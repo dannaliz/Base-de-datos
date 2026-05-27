@@ -1,37 +1,26 @@
 -- ============================================================
 --  DDL.sql  -  Esquema de base de datos: Clinica / Farmacia
---  Modelo Relacional - Practica 04 (versión corregida)
+--  Proyecto final - Modelo relacional
 --
---  Cambios aplicados respecto a la versión anterior:
---    * Se elimina la tabla TENER (no proviene de ninguna relación
---      en el modelo ER).
---    * Se elimina la tabla GENERAR (la relación 1-parcial a 1-total
---      entre TICKET y CONSULTA se representa únicamente con la FK
---      IDTicket dentro de CONSULTA).
---    * Se agrega la tabla UTILIZAR (M:N entre MEDICAMENTO e INSUMO)
---      en sustitución de la FK NombreCientifico dentro de MEDICAMENTO.
---    * Se agrega la tabla GENERAR_CONSULTA_RECETA (1:1 total-total
---      entre CONSULTA y RECETA_MEDICA).
---    * INSUMO ya no incluye FechaCaducidad (esa información se
---      registra al momento de la entrega, en PROVEER_INSUMO).
---    * MEDICAMENTO ya no incluye FechaDeCaducidad, IDPersonal,
---      IDProveedor ni NombreCientifico (esa información proviene
---      de PROVEER_MEDICAMENTO, PREPARAR y UTILIZAR respectivamente).
---    * TICKET ya no incluye IDConsulta (la relación se cierra
---      desde CONSULTA.IDTicket).
---    * CONSULTA ya no incluye IDMedicamento (no existe relación
---      directa que lo justifique).
---    * RECETA_MEDICA ya no incluye IDCliente ni IDConsulta
---      (la relación con CONSULTA se modela mediante GENERAR_CONSULTA_RECETA).
---    * COMPRAR ahora incluye el atributo Cantidad.
---    * Las tablas que provienen de relaciones M:N o ternarias ya
---      no llevan PRIMARY KEY (solo FOREIGN KEYS); las tablas que
---      provienen de entidades o atributos multivaluados sí
---      conservan llave primaria.
---    * CAJERO, LIMPIEZA, CUIDADOR y FARMACEUTICO ahora declaran
---      PRIMARY KEY (IDPersonal).
---    * Se añadieron restricciones de dominio adicionales
---      (NOT NULL y CHECK) en varias tablas.
+--  Politicas aplicadas:
+--
+--  1) Integridad de entidad
+--     Cada entidad fuerte declara PRIMARY KEY simple. Las
+--     especializaciones de PERSONAL usan IDPersonal como PRIMARY KEY.
+--     Los atributos multivaluados, relaciones M:N y relaciones ternarias
+--     declaran PRIMARY KEY compuesta para evitar duplicados.
+--
+--  2) Integridad de dominio
+--     Se definen NOT NULL en atributos obligatorios, DEFAULT en campos
+--     booleanos y de fecha/hora, UNIQUE en atributos con unicidad natural
+--     y CHECK para rangos de fechas, precios, cantidades, porcentajes,
+--     inventario y datos numericos del expediente medico.
+--
+--  3) Integridad referencial
+--     Todas las llaves foraneas tienen acciones explicitas ON DELETE y
+--     ON UPDATE. Las referencias a roles usan las tablas especializadas
+--     correspondientes: CONSULTA apunta a MEDICO y ENFERMERA; PREPARAR
+--     y USAR apuntan a FARMACEUTICO.
 -- ============================================================
 
 -- ============================================================
@@ -70,9 +59,7 @@ DROP TABLE IF EXISTS
     PERSONAL,
     PROVEEDOR,
     SUCURSAL,
-    CLIENTE,
-    GENERAR,
-    TENER
+    CLIENTE
 CASCADE;
 
 CREATE TABLE CLIENTE (
@@ -152,7 +139,7 @@ CREATE TABLE TELEFONO_PROVEEDOR (
     Telefono    VARCHAR(20)
 );
 
--- 8  (se eliminó FechaCaducidad: esta dato se registra en PROVEER_INSUMO)
+-- 8  INSUMO
 CREATE TABLE INSUMO (
     NombreCientifico     VARCHAR(150),
     Presentacion         VARCHAR(100),
@@ -241,7 +228,7 @@ CREATE TABLE TELEFONO_SUCURSAL (
     Telefono   VARCHAR(20)
 );
 
--- 21  (se eliminaron IDPersonal, IDProveedor, NombreCientifico y FechaDeCaducidad)
+-- 21  MEDICAMENTO
 CREATE TABLE MEDICAMENTO (
     IDMedicamento         INT,
     PrecioPublico         DECIMAL(10,2),
@@ -255,7 +242,7 @@ CREATE TABLE MEDICAMENTO (
     Stock                 INT DEFAULT 100
 );
 
--- 22  PROVEER_MEDICAMENTO (relación ternaria)
+-- 22  PROVEER_MEDICAMENTO (relacion ternaria)
 CREATE TABLE PROVEER_MEDICAMENTO (
     IDProveedor               INT,
     IDMedicamento             INT,
@@ -266,7 +253,7 @@ CREATE TABLE PROVEER_MEDICAMENTO (
     FechaDeCaducidad          DATE
 );
 
--- 23  PROVEER_INSUMO (relación ternaria)
+-- 23  PROVEER_INSUMO (relacion ternaria)
 CREATE TABLE PROVEER_INSUMO (
     IDProveedor               INT,
     IDSucursal                INT,
@@ -277,26 +264,26 @@ CREATE TABLE PROVEER_INSUMO (
     FechaDeCaducidad          DATE
 );
 
--- 24  PREPARAR (relación M:N entre PERSONAL/Farmacéutico y MEDICAMENTO)
+-- 24  PREPARAR (relacion M:N entre FARMACEUTICO y MEDICAMENTO)
 CREATE TABLE PREPARAR (
     IDMedicamento INT,
     IDPersonal    INT,
     Cantidad      INT
 );
 
--- 25  USAR (relación M:N entre PERSONAL/Farmacéutico e INSUMO)
+-- 25  USAR (relacion M:N entre FARMACEUTICO e INSUMO)
 CREATE TABLE USAR (
     IDPersonal       INT,
     NombreCientifico VARCHAR(150)
 );
 
--- 26  UTILIZAR (nueva tabla, M:N entre MEDICAMENTO e INSUMO)
+-- 26  UTILIZAR (relacion M:N entre MEDICAMENTO e INSUMO)
 CREATE TABLE UTILIZAR (
     IDMedicamento    INT,
     NombreCientifico VARCHAR(150)
 );
 
--- 27  TICKET  (se eliminó IDConsulta; la relación se cierra desde CONSULTA.IDTicket)
+-- 27  TICKET
 CREATE TABLE TICKET (
     IDTicket          INT,
     IDSucursal        INT,
@@ -308,14 +295,14 @@ CREATE TABLE TICKET (
     DescuentoAplicado DECIMAL(5,2) DEFAULT 0
 );
 
--- 28  COMPRAR (relación M:N entre TICKET y MEDICAMENTO, ahora con Cantidad)
+-- 28  COMPRAR (relacion M:N entre TICKET y MEDICAMENTO)
 CREATE TABLE COMPRAR (
     IDTicket      INT,
     IDMedicamento INT,
     Cantidad      INT
 );
 
--- 29  CONSULTA  (se eliminó IDMedicamento; CONSULTA.IDTicket cierra la relación con TICKET)
+-- 29  CONSULTA
 CREATE TABLE CONSULTA (
     IDConsulta    INT,
     IDCliente     INT,
@@ -329,7 +316,7 @@ CREATE TABLE CONSULTA (
     CostoConsulta DECIMAL(10,2)
 );
 
--- 30  RECETA_MEDICA (se eliminaron IDCliente e IDConsulta)
+-- 30  RECETA_MEDICA
 CREATE TABLE RECETA_MEDICA (
     NumeroReceta    INT,
     FechaNacimiento DATE,
@@ -341,7 +328,7 @@ CREATE TABLE RECETA_MEDICA (
     Turno           VARCHAR(30)
 );
 
--- 31  PEDIR (relación M:N entre RECETA_MEDICA y MEDICAMENTO)
+-- 31  PEDIR (relacion M:N entre RECETA_MEDICA y MEDICAMENTO)
 CREATE TABLE PEDIR (
     NumeroReceta  INT,
     IDMedicamento INT,
@@ -349,7 +336,7 @@ CREATE TABLE PEDIR (
     Frecuencia    VARCHAR(80)
 );
 
--- 32  GENERAR_CONSULTA_RECETA (nueva tabla, 1:1 total-total entre CONSULTA y RECETA_MEDICA)
+-- 32  GENERAR_CONSULTA_RECETA (relacion 1:1 entre CONSULTA y RECETA_MEDICA)
 CREATE TABLE GENERAR_CONSULTA_RECETA (
     IDConsulta   INT,
     NumeroReceta INT
@@ -712,7 +699,7 @@ REFERENCES INSUMO (NombreCientifico)
 ON DELETE RESTRICT
 ON UPDATE CASCADE;
 
--- UTILIZAR (M:N Medicamento-Insumo, NUEVA tabla)
+-- UTILIZAR (M:N Medicamento-Insumo)
 ALTER TABLE UTILIZAR
 ADD CONSTRAINT FK_UtilizarMed FOREIGN KEY (IDMedicamento)
 REFERENCES MEDICAMENTO (IDMedicamento)
@@ -725,7 +712,7 @@ REFERENCES INSUMO (NombreCientifico)
 ON DELETE RESTRICT
 ON UPDATE CASCADE;
 
--- TICKET (ya no incluye IDConsulta)
+-- TICKET
 ALTER TABLE TICKET
 ADD CONSTRAINT FK_TicketSucursal FOREIGN KEY (IDSucursal)
 REFERENCES SUCURSAL (IDSucursal)
@@ -751,7 +738,7 @@ REFERENCES MEDICAMENTO (IDMedicamento)
 ON DELETE RESTRICT
 ON UPDATE CASCADE;
 
--- CONSULTA (sin IDMedicamento; IDTicket cierra la relación con TICKET)
+-- CONSULTA
 ALTER TABLE CONSULTA
 ADD CONSTRAINT FK_ConsultaCliente FOREIGN KEY (IDCliente)
 REFERENCES CLIENTE (IDCliente)
@@ -782,7 +769,7 @@ REFERENCES TICKET (IDTicket)
 ON DELETE RESTRICT
 ON UPDATE CASCADE;
 
--- GENERAR_CONSULTA_RECETA (nueva, 1:1 total-total)
+-- GENERAR_CONSULTA_RECETA (1:1 total-total)
 ALTER TABLE GENERAR_CONSULTA_RECETA
 ADD CONSTRAINT FK_GCR_Consulta FOREIGN KEY (IDConsulta)
 REFERENCES CONSULTA (IDConsulta)
@@ -819,82 +806,91 @@ ON UPDATE CASCADE;
 
 
 -- ============================================================
---  Comentarios (documentación del esquema)
+--  Comentarios de documentacion del esquema
 -- ============================================================
-COMMENT ON TABLE CLIENTE IS 'Almacena la información general del cliente de la clínica o farmacia.';
-COMMENT ON COLUMN CLIENTE.IDCliente IS 'Identificador único del cliente.';
-COMMENT ON COLUMN CLIENTE.Nombre IS 'Nombre o denominación de la entidad.';
-COMMENT ON COLUMN CLIENTE.ApellidoPaterno IS 'Apellido Paterno de la persona registrada.';
-COMMENT ON COLUMN CLIENTE.ApellidoMaterno IS 'Apellido Materno de la persona registrada.';
-COMMENT ON COLUMN CLIENTE.FechaNacimiento IS 'Fecha correspondiente al atributo FechaNacimiento.';
-COMMENT ON COLUMN CLIENTE.Calle IS 'Dato de dirección correspondiente a Calle.';
-COMMENT ON COLUMN CLIENTE.NumExterior IS 'Dato de dirección correspondiente a NumExterior.';
-COMMENT ON COLUMN CLIENTE.NumInterior IS 'Dato de dirección correspondiente a NumInterior.';
-COMMENT ON COLUMN CLIENTE.Colonia IS 'Dato de dirección correspondiente a Colonia.';
-COMMENT ON COLUMN CLIENTE.Estado IS 'Dato de dirección correspondiente a Estado.';
-COMMENT ON COLUMN CLIENTE.MetodoPago IS 'Dato correspondiente a MetodoPago.';
-COMMENT ON COLUMN CLIENTE.NumeroTarjeta IS 'Número de tarjeta asociado al método de pago del cliente.';
-COMMENT ON COLUMN CLIENTE.VencimientoTarjeta IS 'Fecha de vencimiento de la tarjeta del cliente.';
-COMMENT ON COLUMN CLIENTE.Usuario IS 'Nombre de usuario único del cliente en el sistema.';
-COMMENT ON COLUMN CLIENTE.Contrasena IS 'Contraseña cifrada o protegida del cliente.';
-COMMENT ON COLUMN CLIENTE.EsClienteEnLinea IS 'Indicador booleano correspondiente a EsClienteEnLinea.';
-COMMENT ON COLUMN CLIENTE.EsClienteFisico IS 'Indicador booleano correspondiente a EsClienteFisico.';
-COMMENT ON COLUMN CLIENTE.EsPaciente IS 'Indicador booleano correspondiente a EsPaciente.';
+COMMENT ON TABLE CLIENTE IS 'Clientes y pacientes registrados en la clinica/farmacia. Los indicadores booleanos distinguen clientes en linea, fisicos y pacientes.';
+COMMENT ON COLUMN CLIENTE.IDCliente IS 'Identificador unico del cliente.';
+COMMENT ON COLUMN CLIENTE.FechaNacimiento IS 'Fecha de nacimiento del cliente; debe ser una fecha pasada o actual.';
+COMMENT ON COLUMN CLIENTE.MetodoPago IS 'Metodo de pago registrado por el cliente, cuando aplica.';
+COMMENT ON COLUMN CLIENTE.NumeroTarjeta IS 'Numero de tarjeta asociado al metodo de pago, cuando aplica.';
+COMMENT ON COLUMN CLIENTE.VencimientoTarjeta IS 'Fecha de vencimiento de la tarjeta; no debe estar vencida.';
+COMMENT ON COLUMN CLIENTE.Usuario IS 'Nombre de usuario unico para acceso al sistema.';
+COMMENT ON COLUMN CLIENTE.Contrasena IS 'Contrasena almacenada para autenticacion del cliente.';
 
-COMMENT ON TABLE SUCURSAL IS 'Almacena la información de cada sucursal de la clínica/farmacia.';
-COMMENT ON COLUMN SUCURSAL.IDSucursal IS 'Identificador único de la sucursal.';
-COMMENT ON COLUMN SUCURSAL.Nombre IS 'Nombre o denominación de la entidad.';
+COMMENT ON TABLE SUCURSAL IS 'Sucursales donde operan la farmacia y los servicios clinicos.';
+COMMENT ON COLUMN SUCURSAL.IDSucursal IS 'Identificador unico de la sucursal.';
+COMMENT ON COLUMN SUCURSAL.Nombre IS 'Nombre comercial o administrativo de la sucursal.';
 
-COMMENT ON TABLE PROVEEDOR IS 'Almacena la información de los proveedores del sistema.';
-COMMENT ON COLUMN PROVEEDOR.IDProveedor IS 'Identificador único del proveedor.';
-COMMENT ON COLUMN PROVEEDOR.RazonSocial IS 'Razón social del proveedor.';
+COMMENT ON TABLE PROVEEDOR IS 'Proveedores que suministran medicamentos o insumos.';
+COMMENT ON COLUMN PROVEEDOR.IDProveedor IS 'Identificador unico del proveedor.';
+COMMENT ON COLUMN PROVEEDOR.RazonSocial IS 'Razon social del proveedor.';
 
-COMMENT ON TABLE PERSONAL IS 'Almacena la información del personal que labora en una sucursal.';
-COMMENT ON COLUMN PERSONAL.IDPersonal IS 'Identificador único del integrante del personal.';
-COMMENT ON COLUMN PERSONAL.IDSucursal IS 'Sucursal a la que pertenece el integrante del personal.';
-COMMENT ON COLUMN PERSONAL.CedulaProfesional IS 'Cédula profesional del integrante del personal.';
-COMMENT ON COLUMN PERSONAL.RFC IS 'Registro Federal de Contribuyentes del integrante del personal.';
-COMMENT ON COLUMN PERSONAL.Salario IS 'Salario del integrante del personal.';
+COMMENT ON TABLE PERSONAL IS 'Personal que labora en una sucursal.';
+COMMENT ON COLUMN PERSONAL.IDPersonal IS 'Identificador unico del trabajador.';
+COMMENT ON COLUMN PERSONAL.IDSucursal IS 'Sucursal a la que pertenece el trabajador.';
+COMMENT ON COLUMN PERSONAL.CedulaProfesional IS 'Cedula profesional del trabajador, cuando aplica.';
+COMMENT ON COLUMN PERSONAL.RFC IS 'Registro fiscal unico del trabajador.';
+COMMENT ON COLUMN PERSONAL.Salario IS 'Salario del trabajador; no puede ser negativo.';
 
-COMMENT ON TABLE CORREO_CLIENTE IS 'Atributo multivaluado: correos electrónicos asociados a cada cliente.';
-COMMENT ON TABLE TELEFONO_CLIENTE IS 'Atributo multivaluado: teléfonos asociados a cada cliente.';
-COMMENT ON TABLE TELEFONO_PROVEEDOR IS 'Atributo multivaluado: teléfonos asociados a cada proveedor.';
+COMMENT ON TABLE CORREO_CLIENTE IS 'Atributo multivaluado: correos electronicos asociados a cada cliente.';
+COMMENT ON TABLE TELEFONO_CLIENTE IS 'Atributo multivaluado: telefonos asociados a cada cliente.';
+COMMENT ON TABLE TELEFONO_PROVEEDOR IS 'Atributo multivaluado: telefonos asociados a cada proveedor.';
 COMMENT ON TABLE HORARIO_PERSONAL IS 'Atributo multivaluado: horarios asignados al personal.';
-COMMENT ON TABLE CORREO_PERSONAL IS 'Atributo multivaluado: correos electrónicos del personal.';
-COMMENT ON TABLE TELEFONO_PERSONAL IS 'Atributo multivaluado: teléfonos del personal.';
-COMMENT ON TABLE HORARIO_CLINICA IS 'Atributo multivaluado: horarios de cada clínica.';
-COMMENT ON TABLE TELEFONO_SUCURSAL IS 'Atributo multivaluado: teléfonos asociados a cada sucursal.';
+COMMENT ON TABLE CORREO_PERSONAL IS 'Atributo multivaluado: correos electronicos del personal.';
+COMMENT ON TABLE TELEFONO_PERSONAL IS 'Atributo multivaluado: telefonos del personal.';
+COMMENT ON TABLE HORARIO_CLINICA IS 'Atributo multivaluado: horarios de atencion de cada clinica.';
+COMMENT ON TABLE TELEFONO_SUCURSAL IS 'Atributo multivaluado: telefonos asociados a cada sucursal.';
 
-COMMENT ON TABLE INSUMO IS 'Almacena los insumos utilizados en la clínica o farmacia. La fecha de caducidad se registra en PROVEER_INSUMO.';
-COMMENT ON TABLE MEDICAMENTO IS 'Almacena los medicamentos manejados por la farmacia o clínica. La fecha de caducidad, el proveedor, el preparador y los insumos asociados se gestionan en sus tablas de relación.';
-COMMENT ON COLUMN MEDICAMENTO.Stock IS 'Inventario disponible del medicamento; se actualiza mediante triggers.';
+COMMENT ON TABLE INSUMO IS 'Insumos utilizados en farmacia o clinica. La caducidad se controla por lote en PROVEER_INSUMO.';
+COMMENT ON TABLE MEDICAMENTO IS 'Medicamentos manejados por la farmacia. El inventario, precios y preparacion se controlan mediante restricciones, relaciones y triggers.';
+COMMENT ON COLUMN MEDICAMENTO.Stock IS 'Inventario disponible del medicamento; no puede ser negativo.';
+COMMENT ON COLUMN MEDICAMENTO.PrecioPublico IS 'Precio de venta al publico.';
+COMMENT ON COLUMN MEDICAMENTO.PrecioUnitario IS 'Costo unitario del medicamento.';
 
-COMMENT ON TABLE MEDICO IS 'Especialización del personal que desempeña el rol de médico.';
-COMMENT ON COLUMN MEDICO.InstitucionEgreso IS 'Institución educativa de la cual egresó el médico.';
-COMMENT ON COLUMN MEDICO.VigenciaCertificacion IS 'Vigencia de la certificación médica.';
+COMMENT ON TABLE MEDICO IS 'Especializacion de PERSONAL para trabajadores con rol de medico.';
+COMMENT ON COLUMN MEDICO.Especialidad IS 'Especialidad medica registrada.';
+COMMENT ON COLUMN MEDICO.InstitucionEgreso IS 'Institucion educativa de egreso del medico.';
+COMMENT ON COLUMN MEDICO.VigenciaCertificacion IS 'Fecha hasta la cual se considera vigente su certificacion.';
 
-COMMENT ON TABLE ENFERMERA IS 'Especialización del personal que desempeña el rol de enfermera.';
-COMMENT ON COLUMN ENFERMERA.CertificadoReanimacion IS 'Certificación de reanimación cardiopulmonar de la enfermera.';
-COMMENT ON COLUMN ENFERMERA.TipoProcedimiento IS 'Tipo de procedimientos que la enfermera puede ejecutar.';
+COMMENT ON TABLE ENFERMERA IS 'Especializacion de PERSONAL para trabajadores con rol de enfermeria.';
+COMMENT ON COLUMN ENFERMERA.CertificadoReanimacion IS 'Nivel o tipo de certificado de reanimacion.';
+COMMENT ON COLUMN ENFERMERA.TipoProcedimiento IS 'Tipo de procedimiento que puede realizar.';
 
-COMMENT ON TABLE CAJERO IS 'Especialización del personal que desempeña el rol de cajero.';
-COMMENT ON TABLE LIMPIEZA IS 'Especialización del personal que desempeña el rol de limpieza.';
-COMMENT ON TABLE CUIDADOR IS 'Especialización del personal que desempeña el rol de cuidador.';
-COMMENT ON TABLE FARMACEUTICO IS 'Especialización del personal que desempeña el rol de farmacéutico.';
+COMMENT ON TABLE CAJERO IS 'Especializacion de PERSONAL para trabajadores con rol de cajero.';
+COMMENT ON TABLE LIMPIEZA IS 'Especializacion de PERSONAL para trabajadores con rol de limpieza.';
+COMMENT ON TABLE CUIDADOR IS 'Especializacion de PERSONAL para trabajadores con rol de cuidador.';
+COMMENT ON TABLE FARMACEUTICO IS 'Especializacion de PERSONAL para trabajadores con rol farmaceutico.';
 
-COMMENT ON TABLE CLINICA IS 'Almacena la información de la clínica o consultorio dentro de una sucursal.';
-COMMENT ON TABLE PROVEER_MEDICAMENTO IS 'Relación ternaria: registra el suministro de medicamentos de un proveedor a una sucursal, con cantidad, fecha de recibo y fecha de caducidad de cada lote.';
-COMMENT ON TABLE PROVEER_INSUMO IS 'Relación ternaria: registra el suministro de insumos de un proveedor a una sucursal, con cantidad, fecha de recibo y fecha de caducidad de cada lote.';
-COMMENT ON TABLE PREPARAR IS 'Relación M:N: registra qué personal (farmacéutico) prepara qué medicamentos y en qué cantidad.';
-COMMENT ON TABLE USAR IS 'Relación M:N: registra qué personal (farmacéutico) utiliza qué insumos.';
-COMMENT ON TABLE UTILIZAR IS 'Relación M:N: registra qué insumos (sustancia activa) compone cada medicamento.';
-COMMENT ON TABLE TICKET IS 'Almacena los tickets generados por compras o servicios.';
-COMMENT ON COLUMN TICKET.PrecioBruto IS 'Total del ticket antes de aplicar descuento; se recalcula mediante triggers.';
-COMMENT ON COLUMN TICKET.PrecioNeto IS 'Total del ticket despues de aplicar descuento; se recalcula mediante triggers.';
-COMMENT ON COLUMN TICKET.DescuentoAplicado IS 'Porcentaje de descuento aplicado al ticket segun tickets previos del mismo anio.';
-COMMENT ON TABLE COMPRAR IS 'Relación M:N: registra los medicamentos incluidos dentro de un ticket, con la cantidad adquirida.';
-COMMENT ON COLUMN COMPRAR.Cantidad IS 'Cantidad de unidades del medicamento adquiridas en el ticket.';
-COMMENT ON TABLE CONSULTA IS 'Almacena la información de las consultas médicas realizadas.';
-COMMENT ON TABLE RECETA_MEDICA IS 'Almacena la información de las recetas médicas emitidas.';
-COMMENT ON TABLE GENERAR_CONSULTA_RECETA IS 'Relación 1:1 total-total entre CONSULTA y RECETA_MEDICA.';
-COMMENT ON TABLE PEDIR IS 'Relación M:N: registra los medicamentos solicitados en una receta médica.';
+COMMENT ON TABLE CLINICA IS 'Clinicas o consultorios ubicados dentro de una sucursal.';
+COMMENT ON COLUMN CLINICA.NumCuartos IS 'Numero de cuartos disponibles en la clinica; debe ser mayor que cero.';
+
+COMMENT ON TABLE PROVEER_MEDICAMENTO IS 'Relacion ternaria que registra lotes de medicamentos entregados por proveedores a sucursales.';
+COMMENT ON TABLE PROVEER_INSUMO IS 'Relacion ternaria que registra lotes de insumos entregados por proveedores a sucursales.';
+COMMENT ON COLUMN PROVEER_MEDICAMENTO.FechaDeCaducidad IS 'Fecha de caducidad del lote de medicamento.';
+COMMENT ON COLUMN PROVEER_INSUMO.FechaDeCaducidad IS 'Fecha de caducidad del lote de insumo.';
+
+COMMENT ON TABLE PREPARAR IS 'Relacion M:N entre FARMACEUTICO y MEDICAMENTO; registra medicamentos preparados y su cantidad.';
+COMMENT ON TABLE USAR IS 'Relacion M:N entre FARMACEUTICO e INSUMO; registra los insumos utilizados por personal farmaceutico.';
+COMMENT ON TABLE UTILIZAR IS 'Relacion M:N entre MEDICAMENTO e INSUMO; representa la composicion del medicamento.';
+
+COMMENT ON TABLE TICKET IS 'Tickets generados por compras o servicios.';
+COMMENT ON COLUMN TICKET.PrecioBruto IS 'Total del ticket antes de aplicar descuento.';
+COMMENT ON COLUMN TICKET.PrecioNeto IS 'Total del ticket despues de aplicar descuento.';
+COMMENT ON COLUMN TICKET.DescuentoAplicado IS 'Porcentaje de descuento aplicado al ticket.';
+
+COMMENT ON TABLE COMPRAR IS 'Relacion M:N entre TICKET y MEDICAMENTO; registra los productos comprados y su cantidad.';
+COMMENT ON COLUMN COMPRAR.Cantidad IS 'Cantidad de unidades del medicamento incluidas en el ticket.';
+
+COMMENT ON TABLE CONSULTA IS 'Consultas medicas realizadas en una clinica. IDTicket es unico para mantener la relacion 1:1 con TICKET.';
+COMMENT ON COLUMN CONSULTA.IDMedico IS 'Medico responsable de la consulta.';
+COMMENT ON COLUMN CONSULTA.IDEnfermera IS 'Enfermera asociada a la consulta, cuando aplica.';
+COMMENT ON COLUMN CONSULTA.CostoConsulta IS 'Costo de la consulta; no puede ser negativo.';
+
+COMMENT ON TABLE RECETA_MEDICA IS 'Recetas medicas emitidas a partir de una consulta.';
+COMMENT ON COLUMN RECETA_MEDICA.NumeroReceta IS 'Identificador unico de la receta.';
+COMMENT ON COLUMN RECETA_MEDICA.Peso IS 'Peso del paciente al momento de registrar la receta.';
+COMMENT ON COLUMN RECETA_MEDICA.Talla IS 'Talla del paciente al momento de registrar la receta.';
+COMMENT ON COLUMN RECETA_MEDICA.Turno IS 'Turno en el que se emite la receta.';
+
+COMMENT ON TABLE GENERAR_CONSULTA_RECETA IS 'Relacion 1:1 entre CONSULTA y RECETA_MEDICA.';
+COMMENT ON TABLE PEDIR IS 'Relacion M:N entre RECETA_MEDICA y MEDICAMENTO; registra dosis y frecuencia indicadas.';

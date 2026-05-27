@@ -544,7 +544,7 @@ ALTER TABLE INSUMO ALTER COLUMN PrecioUnitario    SET NOT NULL;
 ALTER TABLE INSUMO ADD CONSTRAINT chk_ins_precios
     CHECK (PrecioPublico >= 0 AND PrecioUnitario >= 0);
 
--- ViaAdministracion: dominio enumerado (NOM-072-SSA1)
+-- ViaAdministracion: dominio enumerado usado por el sistema
 ALTER TABLE INSUMO ADD CONSTRAINT chk_ins_via
     CHECK (ViaAdministracion IS NULL OR ViaAdministracion IN
         ('Oral', 'Sublingual', 'Bucal', 'Topica', 'Oftalmica',
@@ -920,7 +920,7 @@ COMMENT ON TABLE SUCURSAL IS
 COMMENT ON TABLE PROVEEDOR IS 'Proveedores. RazonSocial obligatorio.';
 
 COMMENT ON TABLE PERSONAL IS
-    'Personal de la sucursal. RFC unico y validado con patron NOM. '
+    'Personal de la sucursal. RFC unico y validado con patron general. '
     'CedulaProfesional 7-8 digitos.';
 
 COMMENT ON TABLE CORREO_CLIENTE     IS 'Multivaluado. Formato de correo validado.';
