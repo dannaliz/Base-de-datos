@@ -1,9 +1,8 @@
 -- ============================================================
---  DDL.sql  —  Esquema Clinica / Farmacia
---  Modelo Relacional — Practica 04 (version con integridad robusta)
+--  DDL.sql  —  Esquema Farmacia De Otro Mundo
 --
---  Esta version refuerza el esquema con las tres formas clasicas
---  de integridad usando UNICAMENTE restricciones declarativas
+--  Se refuerza el esquema con las tres formas 
+--  de integridad usando restricciones declarativas
 --  (PRIMARY KEY, FOREIGN KEY, UNIQUE, NOT NULL, CHECK). El motor
 --  de PostgreSQL aplica todas las reglas automaticamente tanto en
 --  INSERT como en UPDATE; cualquier operacion que viole la
@@ -12,15 +11,17 @@
 --  POLITICAS APLICADAS
 --  ----------------------------------------------------------------
 --  1) INTEGRIDAD DE ENTIDAD
---     · Toda entidad fuerte declara PRIMARY KEY simple (NOT NULL
+--       Toda entidad fuerte declara PRIMARY KEY simple (NOT NULL
 --       y UNIQUE implicitos).
---     · Toda especializacion (MEDICO, ENFERMERA, CAJERO, LIMPIEZA,
+--
+--       Toda especializacion (MEDICO, ENFERMERA, CAJERO, LIMPIEZA,
 --       CUIDADOR, FARMACEUTICO) declara PRIMARY KEY = IDPersonal
 --       (1:1 con PERSONAL).
---     · Toda tabla derivada de relacion M:N o ternaria declara
+-- 
+--       Toda tabla derivada de relacion M:N o ternaria declara
 --       PRIMARY KEY compuesta — sin esto el motor permitiria
 --       tuplas duplicadas y se perderia la integridad de entidad.
---     · Los atributos multivaluados declaran PK compuesta
+--       Los atributos multivaluados declaran PK compuesta
 --       (entidad + valor del atributo).
 --
 --  2) INTEGRIDAD DE DOMINIO
