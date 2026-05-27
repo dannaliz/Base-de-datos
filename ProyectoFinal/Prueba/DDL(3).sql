@@ -1,15 +1,5 @@
--- ============================================================
 --  DDL.sql  —  Esquema Farmacia De Otro Mundo
---
---  Se refuerza el esquema con las tres formas 
---  de integridad usando restricciones declarativas
---  (PRIMARY KEY, FOREIGN KEY, UNIQUE, NOT NULL, CHECK). El motor
---  de PostgreSQL aplica todas las reglas automaticamente tanto en
---  INSERT como en UPDATE; cualquier operacion que viole la
---  integridad es rechazada sin necesidad de logica adicional.
---
 --  POLITICAS APLICADAS
---  ----------------------------------------------------------------
 --  1) INTEGRIDAD DE ENTIDAD
 --       Toda entidad fuerte declara PRIMARY KEY simple (NOT NULL
 --       y UNIQUE implicitos).
@@ -25,50 +15,46 @@
 --       (entidad + valor del atributo).
 --
 --  2) INTEGRIDAD DE DOMINIO
---     · NOT NULL en todo atributo obligatorio.
---     · CHECK con lista blanca (IN) para los atributos cuyo
+--     NOT NULL en todo atributo obligatorio.
+--      CHECK con lista blanca (IN) para los atributos cuyo
 --       dominio es enumerado: MetodoPago, ViaAdministracion,
 --       TipoDeControl, Clasificacion, Turno, TipoProcedimiento.
---     · CHECK con patron (operador ~ / ~*) para RFC, Cedula
+--      CHECK con patron (operador ~ / ~*) para RFC, Cedula
 --       Profesional, correo, telefono, numero de tarjeta, horario.
---     · CHECK de rango para precios, cantidades, porcentajes,
+--      CHECK de rango para precios, cantidades, porcentajes,
 --       stock, numero de cuartos, fechas.
---     · DEFAULT para booleanos y campos de bitacora.
---     · UNIQUE en atributos con unicidad natural (Usuario, RFC).
---     · Las reglas se verifican automaticamente en INSERT y en
+--     DEFAULT para booleanos y campos de bitacora.
+--      UNIQUE en atributos con unicidad natural (Usuario, RFC).
+--      Las reglas se verifican automaticamente en INSERT y en
 --       UPDATE (comportamiento estandar de PostgreSQL).
 --
 --  3) INTEGRIDAD REFERENCIAL
---     · Toda llave foranea declara politica explicita
+--      Toda llave foranea declara politica explicita
 --       ON DELETE … ON UPDATE … (ninguna queda en el default
 --       NO ACTION para evitar ambiguedad).
---     · CONSULTA.IDMedico referencia MEDICO (no PERSONAL): la
+--      CONSULTA.IDMedico referencia MEDICO (no PERSONAL): la
 --       propia FK garantiza que solo un medico puede aparecer
 --       como medico.  Lo mismo aplica para CONSULTA.IDEnfermera
---       → ENFERMERA, PREPARAR.IDPersonal → FARMACEUTICO y
---       USAR.IDPersonal → FARMACEUTICO.
---     · Reglas generales:
---         · ON UPDATE CASCADE  → las PKs deberian ser estables,
+--       ENFERMERA, PREPARAR.IDPersonal  FARMACEUTICO y
+--       USAR.IDPersonal  FARMACEUTICO.
+--      Reglas generales:
+--         ON UPDATE CASCADE:  las PKs deberian ser estables,
 --                                pero si llegan a cambiar se
 --                                propagan a los hijos.
---         · ON DELETE RESTRICT → no se permite eliminar entidades
+--         ON DELETE RESTRICT:  no se permite eliminar entidades
 --                                que aun tienen historial
 --                                (TICKET, CONSULTA, MEDICAMENTO,
 --                                INSUMO, PERSONAL, SUCURSAL, …).
---         · ON DELETE CASCADE  → para atributos multivaluados,
+--         ON DELETE CASCADE:   para atributos multivaluados,
 --                                especializaciones y tablas que
 --                                solo tienen sentido si el padre
 --                                existe (CORREO_*, TELEFONO_*,
---                                HORARIO_*, COMPRAR ↔ TICKET,
---                                PEDIR ↔ RECETA, GENERAR_CONSULTA_RECETA).
---         · ON DELETE SET NULL → solo para FKs opcionales
+--                                HORARIO_*, COMPRAR  TICKET,
+--                                PEDIR  RECETA, GENERAR_CONSULTA_RECETA).
+--         ON DELETE SET NULL:  solo para FKs opcionales
 --                                (CONSULTA.IDEnfermera).
--- ============================================================
 
-
--- ============================================================
 --  Limpieza del esquema
--- ============================================================
 DROP TABLE IF EXISTS
     GENERAR_CONSULTA_RECETA,
     PEDIR,
@@ -101,18 +87,8 @@ DROP TABLE IF EXISTS
     PERSONAL,
     PROVEEDOR,
     SUCURSAL,
-    CLIENTE,
-    GENERAR,
-    TENER
+    CLIENTE
 CASCADE;
-
-
--- ============================================================
---  CREATE TABLE
---  Se definen los tipos base. Las restricciones de dominio,
---  llaves primarias y foraneas se agregan en bloques posteriores
---  para mantener el archivo legible.
--- ============================================================
 
 -- 1
 CREATE TABLE CLIENTE (
@@ -396,14 +372,7 @@ CREATE TABLE GENERAR_CONSULTA_RECETA (
     NumeroReceta INT
 );
 
-
--- ============================================================
 --  INTEGRIDAD DE ENTIDAD — PRIMARY KEYs
---  Cada PK implica NOT NULL + UNIQUE automaticamente.
---  Las tablas M:N y ternarias reciben PK compuesta para impedir
---  tuplas duplicadas: este es el mecanismo que garantiza la
---  integridad de entidad de la relacion.
--- ============================================================
 
 -- Entidades fuertes
 ALTER TABLE CLIENTE       ADD CONSTRAINT PK_Cliente       PRIMARY KEY (IDCliente);
@@ -465,11 +434,7 @@ ALTER TABLE GENERAR_CONSULTA_RECETA
 ALTER TABLE CONSULTA ADD CONSTRAINT UQ_ConsultaTicket UNIQUE (IDTicket);
 
 
--- ============================================================
 --  INTEGRIDAD DE DOMINIO — NOT NULL, UNIQUE, CHECK
---  Cualquier INSERT o UPDATE que intente colocar un valor
---  fuera del dominio es rechazado por el motor.
--- ============================================================
 
 -- --------- CLIENTE ----------
 ALTER TABLE CLIENTE ALTER COLUMN Nombre           SET NOT NULL;
@@ -712,11 +677,7 @@ ALTER TABLE PEDIR ALTER COLUMN Dosis      SET NOT NULL;
 ALTER TABLE PEDIR ALTER COLUMN Frecuencia SET NOT NULL;
 
 
--- ============================================================
 --  INTEGRIDAD REFERENCIAL — FOREIGN KEYs
---  Toda FK declara explicitamente sus politicas ON DELETE y
---  ON UPDATE. El motor las aplica automaticamente.
--- ============================================================
 
 -- PERSONAL → SUCURSAL
 ALTER TABLE PERSONAL
@@ -758,9 +719,6 @@ ALTER TABLE TELEFONO_PERSONAL
     ON DELETE CASCADE  ON UPDATE CASCADE;
 
 -- Especializaciones de PERSONAL (1:1)
--- ON DELETE CASCADE: si el empleado es dado de baja, su rol
---   tambien desaparece (no tiene sentido conservar la
---   especializacion huerfana).
 ALTER TABLE MEDICO
     ADD CONSTRAINT FK_Medico FOREIGN KEY (IDPersonal)
     REFERENCES PERSONAL (IDPersonal)
@@ -900,9 +858,6 @@ ALTER TABLE COMPRAR
     ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- CONSULTA
--- IDMedico → MEDICO (no PERSONAL): la propia FK garantiza
---   que solo un medico registrado puede aparecer como medico.
--- IDEnfermera → ENFERMERA, idem.
 ALTER TABLE CONSULTA
     ADD CONSTRAINT FK_ConCliente FOREIGN KEY (IDCliente)
     REFERENCES CLIENTE (IDCliente)
@@ -951,10 +906,7 @@ ALTER TABLE PEDIR
     ON DELETE RESTRICT ON UPDATE CASCADE;
 
 
--- ============================================================
 --  Comentarios (documentacion del esquema)
--- ============================================================
-
 COMMENT ON TABLE CLIENTE IS
     'Informacion general del cliente. Restricciones: al menos uno de '
     'EsClienteEnLinea/EsClienteFisico/EsPaciente debe ser TRUE; '
