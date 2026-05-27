@@ -1,4 +1,4 @@
---  DDL.sql  —  Esquema Farmacia De Otro Mundo
+--  DDL.sql - Esquema Farmacia De Otro Mundo
 --  POLITICAS APLICADAS
 --  1) INTEGRIDAD DE ENTIDAD
 --       Toda entidad fuerte declara PRIMARY KEY simple (NOT NULL
@@ -9,7 +9,7 @@
 --       (1:1 con PERSONAL).
 -- 
 --       Toda tabla derivada de relacion M:N o ternaria declara
---       PRIMARY KEY compuesta — sin esto el motor permitiria
+--       PRIMARY KEY compuesta; sin esto el motor permitiria
 --       tuplas duplicadas y se perderia la integridad de entidad.
 --       Los atributos multivaluados declaran PK compuesta
 --       (entidad + valor del atributo).
@@ -30,7 +30,7 @@
 --
 --  3) INTEGRIDAD REFERENCIAL
 --      Toda llave foranea declara politica explicita
---       ON DELETE … ON UPDATE … (ninguna queda en el default
+--       ON DELETE y ON UPDATE (ninguna queda en el default
 --       NO ACTION para evitar ambiguedad).
 --      CONSULTA.IDMedico referencia MEDICO (no PERSONAL): la
 --       propia FK garantiza que solo un medico puede aparecer
@@ -44,7 +44,7 @@
 --         ON DELETE RESTRICT:  no se permite eliminar entidades
 --                                que aun tienen historial
 --                                (TICKET, CONSULTA, MEDICAMENTO,
---                                INSUMO, PERSONAL, SUCURSAL, …).
+--                                INSUMO, PERSONAL, SUCURSAL, etc.).
 --         ON DELETE CASCADE:   para atributos multivaluados,
 --                                especializaciones y tablas que
 --                                solo tienen sentido si el padre
@@ -372,7 +372,7 @@ CREATE TABLE GENERAR_CONSULTA_RECETA (
     NumeroReceta INT
 );
 
---  INTEGRIDAD DE ENTIDAD — PRIMARY KEYs
+--  INTEGRIDAD DE ENTIDAD - PRIMARY KEYs
 
 -- Entidades fuertes
 ALTER TABLE CLIENTE       ADD CONSTRAINT PK_Cliente       PRIMARY KEY (IDCliente);
@@ -404,14 +404,14 @@ ALTER TABLE TELEFONO_PERSONAL  ADD CONSTRAINT PK_TelPersonal     PRIMARY KEY (ID
 ALTER TABLE HORARIO_CLINICA    ADD CONSTRAINT PK_HorarioClinica  PRIMARY KEY (IDClinica, Horario);
 ALTER TABLE TELEFONO_SUCURSAL  ADD CONSTRAINT PK_TelSucursal     PRIMARY KEY (IDSucursal, Telefono);
 
--- Relaciones M:N — PK compuesta sobre los participantes
+-- Relaciones M:N - PK compuesta sobre los participantes
 ALTER TABLE COMPRAR  ADD CONSTRAINT PK_Comprar  PRIMARY KEY (IDTicket, IDMedicamento);
 ALTER TABLE PEDIR    ADD CONSTRAINT PK_Pedir    PRIMARY KEY (NumeroReceta, IDMedicamento);
 ALTER TABLE PREPARAR ADD CONSTRAINT PK_Preparar PRIMARY KEY (IDMedicamento, IDPersonal);
 ALTER TABLE USAR     ADD CONSTRAINT PK_Usar     PRIMARY KEY (IDPersonal, NombreCientifico);
 ALTER TABLE UTILIZAR ADD CONSTRAINT PK_Utilizar PRIMARY KEY (IDMedicamento, NombreCientifico);
 
--- Relaciones ternarias — la fecha de recibo distingue lotes
+-- Relaciones ternarias - la fecha de recibo distingue lotes
 ALTER TABLE PROVEER_MEDICAMENTO
     ADD CONSTRAINT PK_ProveerMed
     PRIMARY KEY (IDProveedor, IDMedicamento, IDSucursal, FechaDeRecibo);
@@ -420,7 +420,7 @@ ALTER TABLE PROVEER_INSUMO
     ADD CONSTRAINT PK_ProveerIns
     PRIMARY KEY (IDProveedor, IDSucursal, NombreCientifico, FechaDeRecibo);
 
--- 1:1 total-total — PK compuesta + UNIQUE en cada lado para
+-- 1:1 total-total - PK compuesta + UNIQUE en cada lado para
 -- forzar cardinalidad uno-a-uno
 ALTER TABLE GENERAR_CONSULTA_RECETA
     ADD CONSTRAINT PK_GCR PRIMARY KEY (IDConsulta, NumeroReceta);
@@ -429,12 +429,12 @@ ALTER TABLE GENERAR_CONSULTA_RECETA
 ALTER TABLE GENERAR_CONSULTA_RECETA
     ADD CONSTRAINT UQ_GCR_Receta   UNIQUE (NumeroReceta);
 
--- Unicidad de TICKET en CONSULTA — la relacion TICKET–CONSULTA
+-- Unicidad de TICKET en CONSULTA - la relacion TICKET-CONSULTA
 -- es 1:1 via CONSULTA.IDTicket
 ALTER TABLE CONSULTA ADD CONSTRAINT UQ_ConsultaTicket UNIQUE (IDTicket);
 
 
---  INTEGRIDAD DE DOMINIO — NOT NULL, UNIQUE, CHECK
+--  INTEGRIDAD DE DOMINIO - NOT NULL, UNIQUE, CHECK
 
 -- --------- CLIENTE ----------
 ALTER TABLE CLIENTE ALTER COLUMN Nombre           SET NOT NULL;
@@ -459,7 +459,7 @@ ALTER TABLE CLIENTE ADD CONSTRAINT chk_cli_metodopago
         ('Efectivo', 'Tarjeta de Credito', 'Tarjeta de Debito',
          'Transferencia', 'Vales'));
 
--- NumeroTarjeta: 13 a 19 digitos (Visa, MasterCard, AmEx, …)
+-- NumeroTarjeta: 13 a 19 digitos.
 ALTER TABLE CLIENTE ADD CONSTRAINT chk_cli_tarjeta
     CHECK (NumeroTarjeta IS NULL OR NumeroTarjeta ~ '^[0-9]{13,19}$');
 
@@ -467,7 +467,7 @@ ALTER TABLE CLIENTE ADD CONSTRAINT chk_cli_tarjeta
 ALTER TABLE CLIENTE ADD CONSTRAINT chk_cli_vencimiento
     CHECK (VencimientoTarjeta IS NULL OR VencimientoTarjeta >= CURRENT_DATE);
 
--- Coherencia: si declara MetodoPago Tarjeta… debe tener numero
+-- Coherencia: si declara MetodoPago Tarjeta debe tener numero
 -- y vencimiento
 ALTER TABLE CLIENTE ADD CONSTRAINT chk_cli_tarjeta_requerida
     CHECK (
@@ -677,9 +677,9 @@ ALTER TABLE PEDIR ALTER COLUMN Dosis      SET NOT NULL;
 ALTER TABLE PEDIR ALTER COLUMN Frecuencia SET NOT NULL;
 
 
---  INTEGRIDAD REFERENCIAL — FOREIGN KEYs
+--  INTEGRIDAD REFERENCIAL - FOREIGN KEYs
 
--- PERSONAL → SUCURSAL
+-- PERSONAL con SUCURSAL
 ALTER TABLE PERSONAL
     ADD CONSTRAINT FK_PersonalSucursal FOREIGN KEY (IDSucursal)
     REFERENCES SUCURSAL (IDSucursal)
@@ -749,7 +749,7 @@ ALTER TABLE FARMACEUTICO
     REFERENCES PERSONAL (IDPersonal)
     ON DELETE CASCADE  ON UPDATE CASCADE;
 
--- CLINICA → SUCURSAL y multivaluado HORARIO_CLINICA
+-- CLINICA con SUCURSAL y multivaluado HORARIO_CLINICA
 ALTER TABLE CLINICA
     ADD CONSTRAINT FK_ClinicaSucursal FOREIGN KEY (IDSucursal)
     REFERENCES SUCURSAL (IDSucursal)
@@ -797,7 +797,7 @@ ALTER TABLE PROVEER_INSUMO
     REFERENCES SUCURSAL (IDSucursal)
     ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- PREPARAR (M:N) — IDPersonal apunta a FARMACEUTICO para
+-- PREPARAR (M:N) - IDPersonal apunta a FARMACEUTICO para
 -- garantizar el rol sin necesidad de logica adicional.
 ALTER TABLE PREPARAR
     ADD CONSTRAINT FK_PrepMed FOREIGN KEY (IDMedicamento)
@@ -809,7 +809,7 @@ ALTER TABLE PREPARAR
     REFERENCES FARMACEUTICO (IDPersonal)
     ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- USAR (M:N) — IDPersonal apunta a FARMACEUTICO por la misma
+-- USAR (M:N) - IDPersonal apunta a FARMACEUTICO por la misma
 -- razon que PREPARAR.
 ALTER TABLE USAR
     ADD CONSTRAINT FK_UsarFarm FOREIGN KEY (IDPersonal)

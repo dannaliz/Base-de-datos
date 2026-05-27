@@ -84,12 +84,12 @@ LANGUAGE plpgsql;
 --
 --  Desarrollo:
 --      1. Calcula ganancia por medicamentos:
---         SUCURSAL -> TICKET -> COMPRAR -> MEDICAMENTO.
+--         SUCURSAL, TICKET, COMPRAR y MEDICAMENTO.
 --         Se multiplica PrecioPublico * Cantidad para respetar
 --         cuantas unidades se vendieron en cada ticket.
 --
 --      2. Calcula ganancia por consultas:
---         SUCURSAL -> CLINICA -> CONSULTA.
+--         SUCURSAL, CLINICA y CONSULTA.
 --         Se suma CONSULTA.CostoConsulta.
 --
 --      3. En ambas consultas se filtra por anio 2026.
