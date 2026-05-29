@@ -1,58 +1,42 @@
--- ============================================================
---  SP.sql - Procedimientos almacenados
---  Esquema: Clinica / Farmacia (PostgreSQL / PL-pgSQL)
--- ============================================================
---  Este archivo contiene los dos procedimientos solicitados:
---
---  1) sp_registrar_farmaceutico(...)
---     Registra un nuevo farmaceutico en PERSONAL y FARMACEUTICO.
---
---  2) sp_eliminar_medicamento(p_id_medicamento)
---     Elimina un medicamento y primero elimina sus referencias
---     en tablas relacionadas.
---
---  Nota:
---  En PostgreSQL los procedimientos se ejecutan con CALL.
--- ============================================================
+-- SP.sql - Procedimientos almacenados
+-- Farmacia De Otro Mundo
+-- Este archivo contiene los dos procedimientos solicitados:
+-- 1) sp_registrar_farmaceutico(...)
+-- Registra un nuevo farmaceutico en PERSONAL y FARMACEUTICO.
+-- 2) sp_eliminar_medicamento(p_id_medicamento)
+-- Elimina un medicamento y primero elimina sus referencias
+-- En tablas relacionadas.
+-- Nota:
+-- En PostgreSQL los procedimientos se ejecutan con CALL.
 
 
--- ============================================================
---  i. Procedimiento: sp_registrar_farmaceutico
--- ============================================================
---  Objetivo:
---      Insertar un nuevo integrante del personal y registrarlo
---      tambien como farmaceutico.
---
---  Parametros:
---      p_nombre, p_apellido_paterno, p_apellido_materno
---          Campos de nombre. No deben aceptar numeros ni simbolos.
---
---      p_cedula
---          Cedula profesional. El DDL exige longitud de 8 caracteres.
---
---      p_rfc
---          RFC del personal. El DDL exige longitud de 13 caracteres.
---
---      p_calle, p_num_ext, p_num_int, p_colonia, p_estado
---          Direccion del farmaceutico.
---
---      p_salario
---          Salario. Debe ser mayor o igual a 0.
---
---      p_id_sucursal
---          Sucursal donde trabajara. Debe existir en SUCURSAL.
---
---  Desarrollo:
---      1. Elimina la version anterior del procedimiento para evitar
---         conflictos si cambia la firma.
---      2. Valida que nombres y apellidos no esten vacios.
---      3. Valida que nombres y apellidos solo tengan letras y espacios.
---      4. Valida cedula, RFC, salario y sucursal.
---      5. Bloquea PERSONAL de forma ligera para calcular MAX(IDPersonal)+1
---         sin que otra sesion tome el mismo ID al mismo tiempo.
---      6. Inserta el registro base en PERSONAL.
---      7. Inserta el mismo IDPersonal en FARMACEUTICO.
--- ============================================================
+-- i. Procedimiento: sp_registrar_farmaceutico
+-- Objetivo:
+-- Insertar un nuevo integrante del personal y registrarlo
+-- tambien como farmaceutico.
+-- Parametros:
+-- p_nombre, p_apellido_paterno, p_apellido_materno
+-- Campos de nombre. No deben aceptar numeros ni simbolos.
+-- p_cedula
+-- Cedula profesional. El DDL exige longitud de 8 caracteres.
+-- p_rfc
+-- RFC del personal. El DDL exige longitud de 13 caracteres.
+-- p_calle, p_num_ext, p_num_int, p_colonia, p_estado
+-- Direccion del farmaceutico.
+-- p_salario
+-- Salario. Debe ser mayor o igual a 0.
+-- p_id_sucursal
+-- Sucursal donde trabajara. Debe existir en SUCURSAL.
+-- Desarrollo:
+-- 1. Elimina la version anterior del procedimiento para evitar
+-- conflictos si cambia la firma.
+-- 2. Valida que nombres y apellidos no esten vacios.
+-- 3. Valida que nombres y apellidos solo tengan letras y espacios.
+-- 4. Valida cedula, RFC, salario y sucursal.
+-- 5. Bloquea PERSONAL de forma ligera para calcular MAX(IDPersonal)+1
+-- sin que otra sesion tome el mismo ID al mismo tiempo.
+-- 6. Inserta el registro base en PERSONAL.
+-- 7. Inserta el mismo IDPersonal en FARMACEUTICO.
 
 DROP PROCEDURE IF EXISTS sp_registrar_farmaceutico(
     VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR,
@@ -162,27 +146,21 @@ END;
 $$;
 
 
--- ============================================================
---  ii. Procedimiento: sp_eliminar_medicamento
--- ============================================================
---  Objetivo:
---      Eliminar un producto/medicamento a partir de su ID.
---
---  Parametro:
---      p_id_medicamento INT
---          Identificador del medicamento que se eliminara.
---
---  Desarrollo:
---      1. Verifica que el medicamento exista.
---      2. Borra referencias en tablas que apuntan a MEDICAMENTO.
---      3. Borra el registro principal de MEDICAMENTO.
---      4. Usa RAISE NOTICE para mostrar cuantas filas se borraron
---         en cada tabla relacionada.
---
---  Motivo del orden:
---      El DDL usa llaves foraneas con restricciones. Por eso primero
---      se eliminan las filas hijas y al final el medicamento.
--- ============================================================
+-- ii. Procedimiento: sp_eliminar_medicamento
+-- Objetivo:
+-- Eliminar un producto/medicamento a partir de su ID.
+-- Parametro:
+-- p_id_medicamento INT
+-- Identificador del medicamento que se eliminara.
+-- Desarrollo:
+-- 1. Verifica que el medicamento exista.
+-- 2. Borra referencias en tablas que apuntan a MEDICAMENTO.
+-- 3. Borra el registro principal de MEDICAMENTO.
+-- 4. Usa RAISE NOTICE para mostrar cuantas filas se borraron
+-- en cada tabla relacionada.
+-- Motivo del orden:
+-- El DDL usa llaves foraneas con restricciones. Por eso primero
+-- se eliminan las filas hijas y al final el medicamento.
 
 DROP PROCEDURE IF EXISTS sp_eliminar_medicamento(INT);
 
@@ -250,9 +228,7 @@ END;
 $$;
 
 
--- ============================================================
---  Ejemplos de uso
--- ============================================================
+-- Ejemplos de uso
 
 -- Registrar un farmaceutico:
 -- CALL sp_registrar_farmaceutico(
