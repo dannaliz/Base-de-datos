@@ -2285,9 +2285,7 @@ VALUES
 (30499, 'ClienteManual499', 'ApellidoP499', 'ApellidoM499', '2024-07-23', 'Calle Cliente Manual 499', '699', NULL, 'Colonia Cliente Manual 499', 'Estado Cliente Manual 499', 'Metodo manual 499', NULL, NULL, 'cliente_manual_499', 'ClaveManual499', false, false, true),
 (30500, 'ClienteManual500', 'ApellidoP500', 'ApellidoM500', '2025-08-24', 'Calle Cliente Manual 500', '700', '9', 'Colonia Cliente Manual 500', 'Estado Cliente Manual 500', 'Metodo manual 500', NULL, NULL, 'cliente_manual_500', 'ClaveManual500', true, false, true);
 
--- ============================================================
---  PATCH 2: Registros faltantes en PROVEEDOR (30821..30850)
--- ============================================================
+
 INSERT INTO PROVEEDOR (IDProveedor, RazonSocial, Calle, NumExterior, NumInterior, Colonia, Estado)
 VALUES
 (30821, 'Proveedor Manual 821', 'Calle Proveedor Manual 821', '1121', NULL, 'Colonia Proveedor Manual 821', 'Estado Proveedor Manual 821'),
@@ -2321,7 +2319,7 @@ VALUES
 (30849, 'Proveedor Manual 849', 'Calle Proveedor Manual 849', '1149', NULL, 'Colonia Proveedor Manual 849', 'Estado Proveedor Manual 849'),
 (30850, 'Proveedor Manual 850', 'Calle Proveedor Manual 850', '1150', NULL, 'Colonia Proveedor Manual 850', 'Estado Proveedor Manual 850');
 
--- Fin de datos extra
+
 
 -- INSERTAR DATOS EN TELEFONO_CLIENTE
 INSERT INTO TELEFONO_CLIENTE (IDCliente, Telefono)
@@ -8249,9 +8247,7 @@ SELECT
     g
 FROM generate_series(1, 300) AS gs(g);
 
--- REGISTROS PARA QUE LAS CONSULTAS QUE NECESITAN RESULTADOS ESPECIFICOS QUE NO MOSTRABAN ANTES
 
--- Consulta iii: 10 enfermeros con ApellidoMaterno que contiene 'llo'.
 INSERT INTO PERSONAL (IDPersonal, IDSucursal, Nombre, ApellidoPaterno, ApellidoMaterno, CedulaProfesional, RFC, Calle, NumExterior, NumInterior, Colonia, Estado, Salario)
 SELECT
     1000 + g,
@@ -8276,7 +8272,7 @@ SELECT
     'Apoyo en consulta'
 FROM generate_series(1, 10) AS gs(g);
 
--- Consulta x: 10 sucursales con al menos 5 medicos cada una.
+
 INSERT INTO PERSONAL (IDPersonal, IDSucursal, Nombre, ApellidoPaterno, ApellidoMaterno, CedulaProfesional, RFC, Calle, NumExterior, NumInterior, Colonia, Estado, Salario)
 SELECT
     1010 + g,
@@ -8307,7 +8303,7 @@ SELECT
     CURRENT_DATE + 365 + g
 FROM generate_series(1, 50) AS gs(g);
 
--- Consulta iv: 10 clientes con compras pero sin consulta.
+
 INSERT INTO TICKET (IDTicket, IDSucursal, IDCliente, Fecha, Hora, PrecioBruto, PrecioNeto, DescuentoAplicado)
 SELECT
     300 + g,
@@ -8327,7 +8323,7 @@ SELECT
     1 + (g % 3)
 FROM generate_series(1, 10) AS gs(g);
 
--- Consulta viii: 10 consultas el 7 de mayo de 2026 entre 12:00 y 16:00.
+
 INSERT INTO TICKET (IDTicket, IDSucursal, IDCliente, Fecha, Hora, PrecioBruto, PrecioNeto, DescuentoAplicado)
 SELECT
     310 + g,
@@ -8379,7 +8375,7 @@ SELECT
     300 + g
 FROM generate_series(1, 10) AS gs(g);
 
--- Consulta xi: 10 sucursales con mas de 3 medicamentos distintos vendidos.
+
 INSERT INTO TICKET (IDTicket, IDSucursal, IDCliente, Fecha, Hora, PrecioBruto, PrecioNeto, DescuentoAplicado)
 SELECT
     320 + g,
@@ -8400,19 +8396,7 @@ SELECT
 FROM generate_series(1, 40) AS gs(g);
 
 
--- ============================================================
--- Datos de apoyo para consultas finales
--- Objetivo:
---   Consulta xiv: agregar 50 estados/zonas distintas para que el
---                 agrupamiento geografico tenga al menos 50 tuplas.
---   Consulta xix: agregar 50 metodos de pago distintos para que el
---                 agrupamiento por metodo tenga al menos 50 tuplas.
---   Consulta xxi: agregar consultas en 50 meses distintos.
---   Consulta xxvi: agregar 50 medicamentos con mas de un proveedor.
--- Usamos VALUES explicitos para evitar datos demasiado mecanicos.
--- ============================================================
 
--- Consulta xiv: sucursales con estados/zonas distintas.
 INSERT INTO SUCURSAL (IDSucursal, Nombre, Calle, NumExterior, NumInterior, Colonia, Estado)
 VALUES
 (2001, 'Sucursal Altavista', 'Calle Cedro', '11', NULL, 'Altavista', 'Zona Norte 01'),
@@ -8466,7 +8450,8 @@ VALUES
 (2049, 'Sucursal Central Medica', 'Calle Central', '524', '22', 'Centro Medico', 'Ruta Metropolitana 04'),
 (2050, 'Sucursal Portal Salud', 'Avenida Portal', '535', NULL, 'Portal Salud', 'Ruta Metropolitana 05');
 
--- Consulta xix: clientes con metodos de pago distintos.
+
+
 INSERT INTO CLIENTE (IDCliente, Nombre, ApellidoPaterno, ApellidoMaterno, FechaNacimiento, Calle, NumExterior, NumInterior, Colonia, Estado, MetodoPago, NumeroTarjeta, VencimientoTarjeta, Usuario, Contrasena, EsClienteEnLinea, EsClienteFisico, EsPaciente)
 VALUES
 (2001, 'Alicia', 'Mendoza', 'Rios', '1991-01-12', 'Calle Olmo', '10', NULL, 'Centro', 'Zona Norte 01', 'Monedero escolar 01', NULL, NULL, 'apoyo_dql_01', 'ClaveDQL01', true, false, true),
@@ -8520,7 +8505,7 @@ VALUES
 (2049, 'Yolanda', 'Peralta', 'Rivera', '1990-01-16', 'Diagonal D', '106', '17', 'Centro', 'Ruta Metropolitana 04', 'Fondo paciente 04', NULL, NULL, 'apoyo_dql_49', 'ClaveDQL49', true, false, false),
 (2050, 'Zulema', 'Rosales', 'Sanchez', '1984-02-25', 'Diagonal E', '108', NULL, 'Centro', 'Ruta Metropolitana 05', 'Fondo paciente 05', NULL, NULL, 'apoyo_dql_50', 'ClaveDQL50', false, true, true);
 
--- Consulta xxi: tickets y consultas distribuidos en 50 meses distintos.
+
 INSERT INTO TICKET (IDTicket, IDSucursal, IDCliente, Fecha, Hora, PrecioBruto, PrecioNeto, DescuentoAplicado)
 VALUES
 (4001, 1, 1, '2021-01-10', '09:00', 0, 0, 0), (4002, 1, 2, '2021-02-11', '09:15', 0, 0, 0),
@@ -8602,7 +8587,7 @@ VALUES
 (4049, 49, 49, 199, 5, 4049, '2025-01-10', '15:05', 'Control mensual de apoyo DQL', 890),
 (4050, 50, 50, 200, 5, 4050, '2025-02-11', '15:20', 'Seguimiento mensual de apoyo DQL', 900);
 
--- Consulta xxvi: medicamentos con mas de un proveedor.
+
 INSERT INTO MEDICAMENTO (IDMedicamento, PrecioPublico, PrecioUnitario, MedicamentosEsteriles, Preparaciones, Formulacion, PreparadosOficiales, Pediatrica, Dermatologica)
 VALUES
 (2001, 151.00, 75.50, false, 'Preparacion apoyo 01', 'Formula apoyo 01', false, true, false),
@@ -8710,9 +8695,7 @@ VALUES
 (1, 2050, 1, 'Refrigerado', 70, '2026-09-09', '2027-09-09'), (2, 2050, 1, 'Refrigerado', 65, '2026-09-10', '2027-09-10');
 
 
--- Consulta xxv: medicamentos con caducidad cercana.
--- Estos lotes vencen dentro de los siguientes 90 dias para que la
--- consulta de medicamentos proximos a caducar tenga resultados.
+
 INSERT INTO MEDICAMENTO (IDMedicamento, PrecioPublico, PrecioUnitario, MedicamentosEsteriles, Preparaciones, Formulacion, PreparadosOficiales, Pediatrica, Dermatologica)
 VALUES
 (2051, 82.50, 41.25, false, 'Lote cercano jarabe adulto', 'Formula caducidad cercana 01', false, false, false),
@@ -8822,10 +8805,6 @@ VALUES
 
 
 
--- ============================================================
--- Refuerzo manual 1: registros adicionales para SUCURSAL
--- Bloque explicito con VALUES, sin tablas temporales ni SELECT.
--- ============================================================
 INSERT INTO SUCURSAL (IDSucursal, Nombre, Calle, NumExterior, NumInterior, Colonia, Estado)
 VALUES
 (30001, 'Sucursal Manual 001', 'Calle Manual 001', '101', NULL, 'Colonia Manual 001', 'Estado Manual 001'),
@@ -9130,7 +9109,7 @@ VALUES
 (30300, 'Sucursal Manual 300', 'Calle Manual 300', '400', '1', 'Colonia Manual 300', 'Estado Manual 300');
 
 
--- Refuerzo manual 2: registros adicionales para SUCURSAL
+
 INSERT INTO SUCURSAL (IDSucursal, Nombre, Calle, NumExterior, NumInterior, Colonia, Estado)
 VALUES
 (30301, 'Sucursal Manual 301', 'Calle Manual 301', '401', NULL, 'Colonia Manual 301', 'Estado Manual 301'),
@@ -9605,7 +9584,7 @@ VALUES
 (30770, 'Sucursal Manual 770', 'Calle Manual 770', '870', NULL, 'Colonia Manual 770', 'Estado Manual 770');
 
 
--- Refuerzo manual 3: registros adicionales para CLIENTE
+
 INSERT INTO CLIENTE (IDCliente, Nombre, ApellidoPaterno, ApellidoMaterno, FechaNacimiento, Calle, NumExterior, NumInterior, Colonia, Estado, MetodoPago, NumeroTarjeta, VencimientoTarjeta, Usuario, Contrasena, EsClienteEnLinea, EsClienteFisico, EsPaciente)
 VALUES
 (30001, 'ClienteManual001', 'ApellidoP001', 'ApellidoM001', '1976-01-01', 'Calle Cliente Manual 001', '201', NULL, 'Colonia Cliente Manual 001', 'Estado Cliente Manual 001', 'Metodo manual 001', NULL, NULL, 'cliente_manual_001', 'ClaveManual001', false, false, true),
@@ -10060,7 +10039,7 @@ VALUES
 (30450, 'ClienteManual450', 'ApellidoP450', 'ApellidoM450', '1977-06-18', 'Calle Cliente Manual 450', '650', '11', 'Colonia Cliente Manual 450', 'Estado Cliente Manual 450', 'Metodo manual 450', NULL, NULL, 'cliente_manual_450', 'ClaveManual450', true, true, true);
 
 
--- Refuerzo manual 4: registros adicionales para PROVEEDOR
+
 INSERT INTO PROVEEDOR (IDProveedor, RazonSocial, Calle, NumExterior, NumInterior, Colonia, Estado)
 VALUES
 (30001, 'Proveedor Manual 001', 'Calle Proveedor Manual 001', '301', NULL, 'Colonia Proveedor Manual 001', 'Estado Proveedor Manual 001'),
@@ -10885,7 +10864,7 @@ VALUES
 (30820, 'Proveedor Manual 820', 'Calle Proveedor Manual 820', '1120', NULL, 'Colonia Proveedor Manual 820', 'Estado Proveedor Manual 820');
 
 
--- Refuerzo manual 5: registros adicionales para INSUMO
+
 INSERT INTO INSUMO (NombreCientifico, Presentacion, FormaFarmaceutica, Concentracion, ViaAdministracion, Clasificacion, Descripcion, LaboratorioFabricante, NombreComercial, TipoDeControl, PrecioPublico, PrecioUnitario)
 VALUES
 ('INS-MAN-001', 'Frasco', 'Solucion', '11mg', 'Topica', 'Excipiente', 'Insumo manual de refuerzo 001', 'Laboratorio Manual 2', 'Insumo Manual 001', 'Controlado', 41.17, 15.64),
@@ -11690,7 +11669,7 @@ VALUES
 ('INS-MAN-800', 'Caja', 'Tableta', '310mg', 'Oral', 'Activo', 'Insumo manual de refuerzo 800', 'Laboratorio Manual 1', 'Insumo Manual 800', 'Libre', 274, 66.2);
 
 
--- Refuerzo manual 6: registros adicionales para CLINICA
+
 INSERT INTO CLINICA (IDClinica, IDSucursal, Nombre, NumCuartos)
 VALUES
 (30001, 30001, 'Clinica Manual 001', 2),
@@ -12545,7 +12524,7 @@ VALUES
 (30850, 30080, 'Clinica Manual 850', 11);
 
 
--- Refuerzo manual 7: registros adicionales para TELEFONO_CLIENTE
+
 INSERT INTO TELEFONO_CLIENTE (IDCliente, Telefono)
 VALUES
 (30001, '5500000001'),
@@ -13050,7 +13029,7 @@ VALUES
 (30500, '5500000500');
 
 
--- Refuerzo manual 8: registros adicionales para CORREO_CLIENTE
+
 INSERT INTO CORREO_CLIENTE (IDCliente, CorreoElectronico)
 VALUES
 (30001, 'cliente.manual.001@farmacia.test'),
@@ -13555,7 +13534,7 @@ VALUES
 (30500, 'cliente.manual.500@farmacia.test');
 
 
--- Refuerzo manual 9: registros adicionales para TELEFONO_PROVEEDOR
+
 INSERT INTO TELEFONO_PROVEEDOR (IDProveedor, Telefono)
 VALUES
 (30001, '5600000001'),
@@ -14380,7 +14359,7 @@ VALUES
 (30820, '5600000820');
 
 
--- Refuerzo manual 10: registros adicionales para TELEFONO_SUCURSAL
+
 INSERT INTO TELEFONO_SUCURSAL (IDSucursal, Telefono)
 VALUES
 (30001, '5800000001'),
@@ -15205,7 +15184,7 @@ VALUES
 (30050, '5800000820');
 
 
--- Refuerzo manual 11: registros adicionales para HORARIO_CLINICA
+
 INSERT INTO HORARIO_CLINICA (IDClinica, Horario)
 VALUES
 (30001, 'Lun-Sab 09:00-15:00'),
@@ -16060,7 +16039,7 @@ VALUES
 (30850, 'Lun-Vie 08:00-18:00');
 
 
--- Refuerzo manual 12: registros adicionales para PERSONAL
+
 INSERT INTO PERSONAL (IDPersonal, IDSucursal, Nombre, ApellidoPaterno, ApellidoMaterno, CedulaProfesional, RFC, Calle, NumExterior, NumInterior, Colonia, Estado, Salario)
 VALUES
 (40001, 30001, 'MedicoManual001', 'PersonalP001', 'PersonalM001', '00040001', 'MED0000000001', 'Calle Personal Manual 001', '401', NULL, 'Colonia Personal Manual 001', 'Estado Laboral Manual 2', 18037.25),
@@ -21165,7 +21144,7 @@ VALUES
 (45850, 30080, 'FarmManual850', 'PersonalP850', 'PersonalM850', '00045850', 'FAR0000000850', 'Calle Personal Manual 850', '1250', NULL, 'Colonia Personal Manual 850', 'Estado Laboral Manual 19', 27237.5);
 
 
--- Refuerzo manual 13: registros adicionales para MEDICO
+
 INSERT INTO MEDICO (IDPersonal, Especialidad, InstitucionEgreso, VigenciaCertificacion)
 VALUES
 (40001, 'Pediatria', 'Universidad Manual 2', CURRENT_DATE + 121),
@@ -22020,7 +21999,7 @@ VALUES
 (40850, 'Dermatologia', 'Universidad Manual 11', CURRENT_DATE + 970);
 
 
--- Refuerzo manual 14: registros adicionales para ENFERMERA
+
 INSERT INTO ENFERMERA (IDPersonal, CertificadoReanimacion, TipoProcedimiento)
 VALUES
 (41001, 'Avanzado', 'Canalizacion'),
@@ -22875,7 +22854,6 @@ VALUES
 (41850, 'Basico', 'Apoyo en consulta');
 
 
--- Refuerzo manual 15: registros adicionales para CAJERO
 INSERT INTO CAJERO (IDPersonal)
 VALUES
 (42001),
@@ -23730,7 +23708,6 @@ VALUES
 (42850);
 
 
--- Refuerzo manual 16: registros adicionales para LIMPIEZA
 INSERT INTO LIMPIEZA (IDPersonal)
 VALUES
 (43001),
@@ -24585,7 +24562,6 @@ VALUES
 (43850);
 
 
--- Refuerzo manual 17: registros adicionales para CUIDADOR
 INSERT INTO CUIDADOR (IDPersonal)
 VALUES
 (44001),
@@ -25440,7 +25416,6 @@ VALUES
 (44850);
 
 
--- Refuerzo manual 18: registros adicionales para FARMACEUTICO
 INSERT INTO FARMACEUTICO (IDPersonal)
 VALUES
 (45001),
@@ -26295,7 +26270,6 @@ VALUES
 (45850);
 
 
--- Refuerzo manual 19: registros adicionales para HORARIO_PERSONAL
 INSERT INTO HORARIO_PERSONAL (IDPersonal, Horario)
 VALUES
 (40001, 'Lun-Vie 09:00-17:00'),
@@ -27150,7 +27124,6 @@ VALUES
 (40850, 'Lun-Vie 09:00-17:00');
 
 
--- Refuerzo manual 20: registros adicionales para CORREO_PERSONAL
 INSERT INTO CORREO_PERSONAL (IDPersonal, CorreoElectronico)
 VALUES
 (40001, 'personal.manual.001@farmacia.test'),
@@ -28005,7 +27978,6 @@ VALUES
 (40850, 'personal.manual.850@farmacia.test');
 
 
--- Refuerzo manual 21: registros adicionales para TELEFONO_PERSONAL
 INSERT INTO TELEFONO_PERSONAL (IDPersonal, Telefono)
 VALUES
 (40001, '5700000001'),
@@ -28860,7 +28832,6 @@ VALUES
 (40850, '5700000850');
 
 
--- Refuerzo manual 22: registros adicionales para MEDICAMENTO
 INSERT INTO MEDICAMENTO (IDMedicamento, PrecioPublico, PrecioUnitario, MedicamentosEsteriles, Preparaciones, Formulacion, PreparadosOficiales, Pediatrica, Dermatologica)
 VALUES
 (40001, 81.35, 20.15, false, 'Preparacion manual medicamento 001', 'Formula manual 001', false, false, false),
@@ -29715,7 +29686,7 @@ VALUES
 (40850, 552.5, 57.5, true, 'Preparacion manual medicamento 850', 'Formula manual 850', false, false, false);
 
 
--- Refuerzo manual 23: registros adicionales para PROVEER_MEDICAMENTO
+
 INSERT INTO PROVEER_MEDICAMENTO (IDProveedor, IDMedicamento, IDSucursal, CondicionDeAlmacenamiento, Cantidad, FechaDeRecibo, FechaDeCaducidad)
 VALUES
 (30001, 40001, 30001, 'Ambiente controlado', 41, CURRENT_DATE, CURRENT_DATE + 181),
@@ -30570,7 +30541,6 @@ VALUES
 (30850, 40850, 30080, 'Ambiente controlado', 50, CURRENT_DATE, CURRENT_DATE + 300);
 
 
--- Refuerzo manual 24: registros adicionales para PROVEER_INSUMO
 INSERT INTO PROVEER_INSUMO (IDProveedor, IDSucursal, NombreCientifico, CondicionDeAlmacenamiento, Cantidad, FechaDeRecibo, FechaDeCaducidad)
 VALUES
 (30001, 30001, 'INS-MAN-001', 'Ambiente controlado', 21, CURRENT_DATE, CURRENT_DATE + 121),
@@ -31275,7 +31245,6 @@ VALUES
 (30700, 30700, 'INS-MAN-700', 'Ambiente controlado', 80, CURRENT_DATE, CURRENT_DATE + 455);
 
 
--- Refuerzo manual 25: registros adicionales para PREPARAR
 INSERT INTO PREPARAR (IDMedicamento, IDPersonal, Cantidad)
 VALUES
 (40001, 45001, 2),
@@ -31980,7 +31949,6 @@ VALUES
 (40700, 45700, 1);
 
 
--- Refuerzo manual 26: registros adicionales para USAR
 INSERT INTO USAR (IDPersonal, NombreCientifico)
 VALUES
 (45001, 'INS-MAN-001'),
@@ -32685,7 +32653,6 @@ VALUES
 (45700, 'INS-MAN-700');
 
 
--- Refuerzo manual 27: registros adicionales para UTILIZAR
 INSERT INTO UTILIZAR (IDMedicamento, NombreCientifico)
 VALUES
 (40001, 'INS-MAN-001'),
@@ -33390,7 +33357,6 @@ VALUES
 (40700, 'INS-MAN-700');
 
 
--- Refuerzo manual 28: registros adicionales para TICKET
 INSERT INTO TICKET (IDTicket, IDSucursal, IDCliente, Fecha, Hora, PrecioBruto, PrecioNeto, DescuentoAplicado)
 VALUES
 (50001, 30001, 30001, '2026-05-26', '09:00', 0, 0, 0),
@@ -34095,7 +34061,6 @@ VALUES
 (50700, 30700, 30250, '2024-06-26', '08:00', 0, 0, 0);
 
 
--- Refuerzo manual 29: registros adicionales para COMPRAR
 INSERT INTO COMPRAR (IDTicket, IDMedicamento, Cantidad)
 VALUES
 (50001, 40001, 1),
@@ -34800,7 +34765,6 @@ VALUES
 (50700, 40700, 1);
 
 
--- Refuerzo manual 30: registros adicionales para CONSULTA
 INSERT INTO CONSULTA (IDConsulta, IDCliente, IDMedico, IDEnfermera, IDClinica, IDTicket, Fecha, Hora, Diagnostico, CostoConsulta)
 VALUES
 (50001, 30001, 40001, 41001, 30001, 50001, '2026-05-26', '10:30', 'Consulta manual de refuerzo 001', 351.2),
@@ -35505,7 +35469,6 @@ VALUES
 (50700, 30250, 40700, 41700, 30700, 50700, '2024-06-26', '13:30', 'Consulta manual de refuerzo 700', 590);
 
 
--- Refuerzo manual 31: registros adicionales para RECETA_MEDICA
 INSERT INTO RECETA_MEDICA (NumeroReceta, FechaNacimiento, Peso, Talla, Alergias, Diagnostico, Consultorio, Turno)
 VALUES
 (50001, '1981-01-01', 50.7, 1.46, 'Ninguna', 'Diagnostico manual 001', 'Consultorio M-001', 'Vespertino'),
@@ -36210,7 +36173,6 @@ VALUES
 (50700, '1990-04-25', 50, 1.85, 'Mariscos', 'Diagnostico manual 700', 'Consultorio M-700', 'Vespertino');
 
 
--- Refuerzo manual 32: registros adicionales para PEDIR
 INSERT INTO PEDIR (NumeroReceta, IDMedicamento, Dosis, Frecuencia)
 VALUES
 (50001, 40001, 'Dosis manual 2', 'Cada 8 horas'),
@@ -36915,7 +36877,6 @@ VALUES
 (50700, 40700, 'Dosis manual 1', 'Cada 6 horas');
 
 
--- Refuerzo manual 33: registros adicionales para GENERAR_CONSULTA_RECETA
 INSERT INTO GENERAR_CONSULTA_RECETA (IDConsulta, NumeroReceta)
 VALUES
 (50001, 50001),
@@ -37619,7 +37580,7 @@ VALUES
 (50699, 50699),
 (50700, 50700);
 
--- Tickets previos del anio actual para activar descuento
+
 INSERT INTO TICKET (IDTicket, IDSucursal, IDCliente, Fecha, Hora, PrecioBruto, PrecioNeto, DescuentoAplicado)
 VALUES
 (60001, 30001, 30001, '2026-01-01', '09:10', 0, 0, 0),
@@ -37734,7 +37695,7 @@ VALUES
 (60110, 30110, 30110, '2026-05-02', '08:10', 0, 0, 0);
 
 
--- Tickets con descuento para 60 clientes distintos
+
 INSERT INTO TICKET (IDTicket, IDSucursal, IDCliente, Fecha, Hora, PrecioBruto, PrecioNeto, DescuentoAplicado)
 VALUES
 (60111, 30001, 30151, '2026-06-01', '10:40', 0, 0, 5),
@@ -37799,7 +37760,6 @@ VALUES
 (60170, 30060, 30210, '2026-08-06', '13:40', 0, 0, 5);
 
 
--- Compras para recalcular bruto y neto de tickets con descuento
 INSERT INTO COMPRAR (IDTicket, IDMedicamento, Cantidad)
 VALUES
 (60111, 40001, 2),
