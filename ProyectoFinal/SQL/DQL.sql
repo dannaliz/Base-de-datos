@@ -561,7 +561,7 @@ ORDER BY
 
 
 -- Consulta xxii
--- Top 10 medicamentos más recetados en todo el sistema,
+-- Top 51 medicamentos más recetados en todo el sistema,
 -- con el número de recetas distintas en las que aparecen
 -- y un resumen de las dosis prescritas.
 
@@ -580,7 +580,7 @@ GROUP BY
     M.PrecioPublico,
     M.Stock
 ORDER BY VecesRecetado DESC
-LIMIT 10;
+LIMIT 51;
 
 
 -- Consulta xxiii
