@@ -1,77 +1,50 @@
--- ============================================================
---  Trigger.sql - Disparadores
---  Esquema: Clinica / Farmacia (PostgreSQL / PL-pgSQL)
--- ============================================================
---  Este archivo contiene los disparadores solicitados:
+-- Triggers - Disparadores
+-- Farmacia De Otro Mundo
+-- Este archivo contiene los disparadores solicitados:
 --
---  1) Triggers de stock de MEDICAMENTO.
---     Actualizan el inventario cuando:
---       - un proveedor provee medicamento;
---       - un farmaceutico prepara medicamento;
---       - un cliente compra medicamento.
+-- 1) Triggers de stock de MEDICAMENTO.
+-- Actualizan el inventario cuando:
+-- _un proveedor provee medicamento;
+-- _un farmaceutico prepara medicamento;
+-- _un cliente compra medicamento.
 --
---  2) Triggers de calculo del TICKET.
---     Calculan:
---       - PrecioBruto;
---       - DescuentoAplicado;
---       - PrecioNeto.
---
---  Orden recomendado de ejecucion:
---      1. DDL.sql
---      2. Trigger.sql
---      3. DML.sql
---
---  Los atributos que usan los triggers ya deben existir desde
---  DDL.sql. Este archivo solo define funciones y disparadores.
--- ============================================================
+-- 2) Triggers de calculo del TICKET.
+-- Calculan:
+-- _PrecioBruto;
+-- _DescuentoAplicado;
+-- _PrecioNeto.
 
 
--- ============================================================
---  0) Columnas usadas por estos triggers
--- ============================================================
---  MEDICAMENTO.Stock:
---      Guarda el inventario disponible por medicamento.
---
---  TICKET.PrecioBruto:
---      Suma de todos los renglones del ticket antes de descuento.
---
---  TICKET.DescuentoAplicado:
---      Porcentaje de descuento aplicado al ticket.
---
---  TICKET.PrecioNeto:
---      Total final despues de aplicar el descuento.
---
---  TICKET.Fecha:
---      Se usa para saber cuantos tickets previos existen en el mismo
---      anio y asi calcular el descuento.
--- ============================================================
+-- 0) Columnas usadas por estos triggers
+-- MEDICAMENTO.Stock:
+-- Guarda el inventario disponible por medicamento.
+-- TICKET.PrecioBruto:
+-- Suma de todos los renglones del ticket antes de descuento.
+-- TICKET.DescuentoAplicado:
+-- Porcentaje de descuento aplicado al ticket.
+-- TICKET.PrecioNeto:
+-- Total final despues de aplicar el descuento.
+-- TICKET.Fecha:
+-- Se usa para saber cuantos tickets previos existen en el mismo
+-- anio y asi calcular el descuento.
 
-
--- ============================================================
---  i. Trigger de stock cuando un proveedor provee medicamento
--- ============================================================
---  Tabla observada:
---      PROVEER_MEDICAMENTO
---
---  Momento:
---      AFTER INSERT OR UPDATE OR DELETE
---
---  Desarrollo:
---      INSERT:
---          Suma NEW.Cantidad al stock del medicamento recibido.
---
---      UPDATE:
---          Resta OLD.Cantidad del medicamento anterior y suma
---          NEW.Cantidad al medicamento nuevo. Esto cubre tanto
---          cambios de cantidad como cambios de IDMedicamento.
---
---      DELETE:
---          Resta OLD.Cantidad porque ese suministro ya no existe.
---
---  Motivo de AFTER:
---      La fila ya paso las validaciones y llaves foraneas, por lo que
---      el cambio en inventario se hace solo cuando la operacion existe.
--- ============================================================
+-- i. Trigger de stock cuando un proveedor provee medicamento
+-- Tabla observada:
+-- PROVEER_MEDICAMENTO
+-- Momento:
+-- AFTER INSERT OR UPDATE OR DELETE
+-- Desarrollo:
+-- INSERT:
+-- Suma NEW.Cantidad al stock del medicamento recibido.
+-- UPDATE:
+-- Resta OLD.Cantidad del medicamento anterior y suma
+-- NEW.Cantidad al medicamento nuevo. Esto cubre tanto
+-- cambios de cantidad como cambios de IDMedicamento.
+-- DELETE:
+-- Resta OLD.Cantidad porque ese suministro ya no existe.
+-- Motivo de AFTER:
+-- La fila ya paso las validaciones y llaves foraneas, por lo que
+-- el cambio en inventario se hace solo cuando la operacion existe.
 
 CREATE OR REPLACE FUNCTION fn_stock_proveer_medicamento()
 RETURNS TRIGGER
@@ -98,7 +71,6 @@ BEGIN
          WHERE IDMedicamento = OLD.IDMedicamento;
     END IF;
 
-    -- En triggers AFTER se regresa NULL porque la fila ya fue procesada.
     RETURN NULL;
 END;
 $$;
@@ -111,25 +83,18 @@ FOR EACH ROW
 EXECUTE FUNCTION fn_stock_proveer_medicamento();
 
 
--- ============================================================
---  ii. Trigger de stock cuando un farmaceutico prepara medicamento
--- ============================================================
---  Tabla observada:
---      PREPARAR
---
---  Momento:
---      AFTER INSERT OR UPDATE OR DELETE
---
---  Desarrollo:
---      INSERT:
---          Suma al stock porque se preparo medicamento nuevo.
---
---      UPDATE:
---          Deshace el efecto de la fila anterior y aplica el nuevo.
---
---      DELETE:
---          Resta del stock porque se elimina una preparacion registrada.
--- ============================================================
+-- ii. Trigger de stock cuando un farmaceutico prepara medicamento
+-- Tabla observada:
+-- PREPARAR
+-- Momento:
+-- AFTER INSERT OR UPDATE OR DELETE
+-- Desarrollo:
+-- INSERT:
+-- Suma al stock porque se preparo medicamento nuevo.
+-- UPDATE:
+-- Deshace el efecto de la fila anterior y aplica el nuevo.
+-- DELETE:
+-- Resta del stock porque se elimina una preparacion registrada.
 
 CREATE OR REPLACE FUNCTION fn_stock_preparar()
 RETURNS TRIGGER
@@ -168,30 +133,22 @@ FOR EACH ROW
 EXECUTE FUNCTION fn_stock_preparar();
 
 
--- ============================================================
---  iii. Trigger de stock cuando un cliente compra medicamento
--- ============================================================
---  Tabla observada:
---      COMPRAR
---
---  Momento:
---      AFTER INSERT OR UPDATE OR DELETE
---
---  Desarrollo:
---      INSERT:
---          Verifica que exista stock suficiente y descuenta la cantidad.
---
---      UPDATE:
---          Devuelve al stock la cantidad anterior y despues intenta
---          descontar la cantidad nueva.
---
---      DELETE:
---          Devuelve al inventario la cantidad que se habia vendido.
---
---  Validacion:
---      Si no hay suficiente stock, se lanza EXCEPTION para cancelar
---      la operacion de compra.
--- ============================================================
+-- iii. Trigger de stock cuando un cliente compra medicamento
+-- Tabla observada:
+-- COMPRAR
+-- Momento:
+-- AFTER INSERT OR UPDATE OR DELETE
+-- Desarrollo:
+-- INSERT:
+-- Verifica que exista stock suficiente y descuenta la cantidad.
+-- UPDATE:
+-- Devuelve al stock la cantidad anterior y despues intenta
+-- descontar la cantidad nueva.
+-- DELETE:
+-- Devuelve al inventario la cantidad que se habia vendido.
+-- Validacion:
+-- Si no hay suficiente stock, se lanza EXCEPTION para cancelar
+-- la operacion de compra.
 
 CREATE OR REPLACE FUNCTION fn_stock_comprar()
 RETURNS TRIGGER
@@ -266,23 +223,18 @@ FOR EACH ROW
 EXECUTE FUNCTION fn_stock_comprar();
 
 
--- ============================================================
---  iv. Funcion auxiliar: fn_calcular_descuento
--- ============================================================
---  Objetivo:
---      Calcular el porcentaje de descuento de un ticket segun
---      cuantos tickets previos existen en el mismo anio.
---
---  Regla usada:
---      tickets previos        descuento
---      0 a 99                 0%
---      100 a 499              5%
---      500 a 1999             10%
---      2000 o mas             15%
---
---  Se declara IMMUTABLE porque para el mismo numero de tickets
---  previos siempre regresa el mismo descuento.
--- ============================================================
+-- iv. Funcion auxiliar: fn_calcular_descuento
+-- Objetivo:
+-- Calcular el porcentaje de descuento de un ticket segun
+-- cuantos tickets previos existen en el mismo anio.
+-- Regla usada:
+-- tickets previos        descuento
+-- 0 a 99                 0%
+-- 100 a 499              5%
+-- 500 a 1999             10%
+-- 2000 o mas             15%
+-- Se declara IMMUTABLE porque para el mismo numero de tickets
+-- previos siempre regresa el mismo descuento.
 
 CREATE OR REPLACE FUNCTION fn_calcular_descuento(p_tickets_previos INT)
 RETURNS DECIMAL(5,2)
@@ -303,24 +255,18 @@ END;
 $$;
 
 
--- ============================================================
---  v. Trigger para fijar descuento inicial del ticket
--- ============================================================
---  Tabla observada:
---      TICKET
---
---  Momento:
---      BEFORE INSERT
---
---  Desarrollo:
---      1. Si NEW.Fecha viene NULL, usa CURRENT_DATE.
---      2. Cuenta cuantos tickets ya existen en el mismo anio.
---      3. Calcula DescuentoAplicado con fn_calcular_descuento.
---      4. Inicializa PrecioBruto y PrecioNeto en 0 si vienen NULL.
---
---  Motivo de BEFORE:
---      El descuento debe quedar guardado en la fila antes de insertarla.
--- ============================================================
+-- v. Trigger para fijar descuento inicial del ticket
+-- Tabla observada:
+-- TICKET
+-- Momento:
+-- BEFORE INSERT
+-- Desarrollo:
+-- 1. Si NEW.Fecha viene NULL, usa CURRENT_DATE.
+-- 2. Cuenta cuantos tickets ya existen en el mismo anio.
+-- 3. Calcula DescuentoAplicado con fn_calcular_descuento.
+-- 4. Inicializa PrecioBruto y PrecioNeto en 0 si vienen NULL.
+-- Motivo de BEFORE:
+-- El descuento debe quedar guardado en la fila antes de insertarla.
 
 CREATE OR REPLACE FUNCTION fn_ticket_set_descuento()
 RETURNS TRIGGER
@@ -361,30 +307,24 @@ FOR EACH ROW
 EXECUTE FUNCTION fn_ticket_set_descuento();
 
 
--- ============================================================
---  vi. Trigger para recalcular precios del ticket
--- ============================================================
---  Tabla observada:
---      COMPRAR
---
---  Momento:
---      AFTER INSERT OR UPDATE OR DELETE
---
---  Desarrollo:
---      1. Identifica que ticket fue afectado.
---      2. Calcula PrecioBruto con:
---             SUM(COMPRAR.Cantidad * MEDICAMENTO.PrecioPublico)
---      3. Lee el DescuentoAplicado ya guardado en TICKET.
---      4. Calcula PrecioNeto:
---             PrecioBruto * (1 - DescuentoAplicado / 100)
---      5. Actualiza TICKET.
---      6. Si un UPDATE movio un renglon de un ticket a otro, tambien
---         recalcula el ticket anterior.
---
---  Motivo de AFTER:
---      El calculo necesita que la fila de COMPRAR ya exista, cambie o
---      desaparezca para sumar correctamente los renglones actuales.
--- ============================================================
+-- vi. Trigger para recalcular precios del ticket
+-- Tabla observada:
+-- COMPRAR
+-- Momento:
+-- AFTER INSERT OR UPDATE OR DELETE
+-- Desarrollo:
+-- 1. Identifica que ticket fue afectado.
+-- 2. Calcula PrecioBruto con:
+-- SUM(COMPRAR.Cantidad * MEDICAMENTO.PrecioPublico)
+-- 3. Lee el DescuentoAplicado ya guardado en TICKET.
+-- 4. Calcula PrecioNeto:
+-- PrecioBruto * (1 - DescuentoAplicado / 100)
+-- 5. Actualiza TICKET.
+-- 6. Si un UPDATE movio un renglon de un ticket a otro, tambien
+-- recalcula el ticket anterior.
+-- Motivo de AFTER:
+-- El calculo necesita que la fila de COMPRAR ya exista, cambie o
+-- desaparezca para sumar correctamente los renglones actuales.
 
 CREATE OR REPLACE FUNCTION fn_ticket_recalcular_precios()
 RETURNS TRIGGER
@@ -460,10 +400,7 @@ FOR EACH ROW
 EXECUTE FUNCTION fn_ticket_recalcular_precios();
 
 
--- ============================================================
---  Ejemplos de prueba
--- ============================================================
-
+-- Ejemplos de prueba
 -- 1) Cuando un proveedor provee, el stock sube:
 -- INSERT INTO PROVEER_MEDICAMENTO
 --     (IDProveedor, IDMedicamento, IDSucursal,
