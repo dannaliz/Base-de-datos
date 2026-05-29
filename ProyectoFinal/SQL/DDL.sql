@@ -1,32 +1,25 @@
--- ============================================================
---  DDL.sql  -  Esquema de base de datos: Clinica / Farmacia
---  Proyecto final - Modelo relacional
---
---  Politicas aplicadas:
---
---  1) Integridad de entidad
---     Cada entidad fuerte declara PRIMARY KEY simple. Las
---     especializaciones de PERSONAL usan IDPersonal como PRIMARY KEY.
---     Los atributos multivaluados, relaciones M:N y relaciones ternarias
---     declaran PRIMARY KEY compuesta para evitar duplicados.
---
---  2) Integridad de dominio
---     Se definen NOT NULL en atributos obligatorios, DEFAULT en campos
---     booleanos y de fecha/hora, UNIQUE en atributos con unicidad natural
---     y CHECK para rangos de fechas, precios, cantidades, porcentajes,
---     inventario y datos numericos del expediente medico.
---
---  3) Integridad referencial
---     Todas las llaves foraneas tienen acciones explicitas ON DELETE y
---     ON UPDATE. Las referencias a roles usan las tablas especializadas
---     correspondientes: CONSULTA apunta a MEDICO y ENFERMERA; PREPARAR
---     y USAR apuntan a FARMACEUTICO.
--- ============================================================
+-- DDL.sql  -  Esquema de base de datos: Famacia De Otro Mundo
+-- Proyecto final - Modelo relacional
+-- Politicas aplicadas:
+-- 1) Integridad de entidad
+-- Cada entidad fuerte declara PRIMARY KEY simple. Las
+-- especializaciones de PERSONAL usan IDPersonal como PRIMARY KEY.
+-- Los atributos multivaluados, relaciones M:N y relaciones ternarias
+-- declaran PRIMARY KEY compuesta para evitar duplicados.
+-- 2) Integridad de dominio
+-- Se definen NOT NULL en atributos obligatorios, DEFAULT en campos
+-- booleanos y de fecha/hora, UNIQUE en atributos con unicidad natural
+-- y CHECK para rangos de fechas, precios, cantidades, porcentajes,
+-- inventario y datos numericos del expediente medico.
+-- 3) Integridad referencial
+-- Todas las llaves foraneas tienen acciones explicitas ON DELETE y
+-- ON UPDATE. Las referencias a roles usan las tablas especializadas
+-- correspondientes: CONSULTA apunta a MEDICO y ENFERMERA; PREPARAR
+-- y USAR apuntan a FARMACEUTICO.
 
--- ============================================================
 --  Limpieza del esquema
 --  Permite ejecutar este DDL desde cero aunque ya existan tablas.
--- ============================================================
+
 DROP TABLE IF EXISTS
     GENERAR_CONSULTA_RECETA,
     PEDIR,
@@ -343,9 +336,8 @@ CREATE TABLE GENERAR_CONSULTA_RECETA (
 );
 
 
--- ============================================================
 --  Restricciones de dominio (NOT NULL, CHECK, UNIQUE)
--- ============================================================
+
 ALTER TABLE CLIENTE ALTER COLUMN Nombre SET NOT NULL;
 ALTER TABLE CLIENTE ALTER COLUMN ApellidoMaterno SET NOT NULL;
 ALTER TABLE CLIENTE ALTER COLUMN ApellidoPaterno SET NOT NULL;
@@ -469,10 +461,9 @@ ALTER TABLE CLIENTE ADD CONSTRAINT UQ_Usuario UNIQUE (Usuario);
 ALTER TABLE PERSONAL ADD CONSTRAINT UQ_RFC UNIQUE (RFC);
 
 
--- ============================================================
 --  Llaves primarias (entidades, especializaciones, atributos
 --  multivaluados y relaciones con llave compuesta).
--- ============================================================
+
 ALTER TABLE CLIENTE       ADD CONSTRAINT PK_IDCliente        PRIMARY KEY (IDCliente);
 ALTER TABLE SUCURSAL      ADD CONSTRAINT PK_IDSucursal       PRIMARY KEY (IDSucursal);
 ALTER TABLE PROVEEDOR     ADD CONSTRAINT PK_IDProveedor      PRIMARY KEY (IDProveedor);
@@ -527,9 +518,7 @@ ALTER TABLE CONSULTA
 ADD CONSTRAINT UQ_ConsultaTicket UNIQUE (IDTicket);
 
 
--- ============================================================
 --  Llaves foráneas
--- ============================================================
 
 -- PERSONAL con SUCURSAL
 ALTER TABLE PERSONAL
@@ -803,9 +792,8 @@ ON DELETE RESTRICT
 ON UPDATE CASCADE;
 
 
--- ============================================================
 --  Comentarios de documentacion del esquema
--- ============================================================
+
 COMMENT ON TABLE CLIENTE IS 'Clientes y pacientes registrados en la clinica/farmacia. Los indicadores booleanos distinguen clientes en linea, fisicos y pacientes.';
 COMMENT ON COLUMN CLIENTE.IDCliente IS 'Identificador unico del cliente.';
 COMMENT ON COLUMN CLIENTE.FechaNacimiento IS 'Fecha de nacimiento del cliente; debe ser una fecha pasada o actual.';
