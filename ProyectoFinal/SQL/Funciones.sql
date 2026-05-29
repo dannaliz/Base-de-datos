@@ -1,44 +1,33 @@
--- ============================================================
---  Funciones.sql - Funciones solicitadas
---  Esquema: Clinica / Farmacia (PostgreSQL / PL-pgSQL)
--- ============================================================
---  Este archivo contiene las dos funciones pedidas:
---
---  1) reconoceredad(p_idCliente)
---     Recibe el identificador de un cliente y regresa su edad.
---
---  2) calculaganancias(p_nombre_sucursal)
---     Recibe el nombre de una sucursal y calcula sus ganancias
---     durante el anio 2026.
---
---  Nota de carga:
---  Los ejemplos al final de cada funcion estan comentados para
---  que el archivo pueda ejecutarse sin lanzar consultas de prueba.
--- ============================================================
+-- Funciones.sql - Funciones solicitadas
+-- Farmacia De Otra Mundo
+-- Este archivo contiene las dos funciones pedidas:
+-- 1) reconoceredad(p_idCliente)
+-- Recibe el identificador de un cliente y regresa su edad.
+-- 2) calculaganancias(p_nombre_sucursal)
+-- Recibe el nombre de una sucursal y calcula sus ganancias
+-- durante el anio 2026.
+-- Nota de carga:
+-- Los ejemplos al final de cada funcion estan comentados para
+-- que el archivo pueda ejecutarse sin lanzar consultas de prueba.
 
 
--- ============================================================
---  i. Funcion: reconoceredad
--- ============================================================
---  Objetivo:
---      Calcular la edad actual de un cliente.
---
---  Parametro:
---      p_idCliente INT
---          ID del cliente que se buscara en la tabla CLIENTE.
---
---  Regresa:
---      INT
---          Edad calculada con base en CLIENTE.FechaNacimiento.
---          Si el cliente no existe, o no se encuentra fecha, regresa NULL.
---
---  Desarrollo:
---      1. Busca la FechaNacimiento del cliente.
---      2. Si no se encontro fecha, termina regresando NULL.
---      3. AGE(CURRENT_DATE, fecha) calcula el intervalo de tiempo.
---      4. DATE_PART('year', ...) extrae los anios completos.
---      5. Se convierte el resultado a INT porque DATE_PART regresa DOUBLE.
--- ============================================================
+-- i. Funcion: reconoceredad
+-- Objetivo:
+-- Calcular la edad actual de un cliente.
+-- Parametro:
+-- p_idCliente INT
+-- ID del cliente que se buscara en la tabla CLIENTE.
+-- Regresa:
+-- INT
+-- Edad calculada con base en CLIENTE.FechaNacimiento.
+-- Si el cliente no existe, o no se encuentra fecha, regresa NULL.
+-- Desarrollo:
+-- 1. Busca la FechaNacimiento del cliente.
+-- 2. Si no se encontro fecha, termina regresando NULL.
+-- 3. AGE(CURRENT_DATE, fecha) calcula el intervalo de tiempo.
+-- 4. DATE_PART('year', ...) extrae los anios completos.
+-- 5. Se convierte el resultado a INT porque DATE_PART regresa DOUBLE.
+
 CREATE OR REPLACE FUNCTION reconoceredad(p_idCliente INT)
 RETURNS INT
 AS $$
@@ -66,36 +55,28 @@ LANGUAGE plpgsql;
 -- SELECT reconoceredad(200);
 
 
--- ============================================================
---  ii. Funcion: calculaganancias
--- ============================================================
---  Objetivo:
---      Calcular las ganancias de una sucursal durante el anio 2026.
---
---  Parametro:
---      p_nombre_sucursal VARCHAR(120)
---          Nombre exacto de la sucursal, tomado de SUCURSAL.Nombre.
---
---  Regresa:
---      NUMERIC(12,2)
---          Suma de:
---          - ventas de medicamentos en tickets del anio 2026;
---          - costos de consultas realizadas en el anio 2026.
---
---  Desarrollo:
---      1. Calcula ganancia por medicamentos:
---         SUCURSAL, TICKET, COMPRAR y MEDICAMENTO.
---         Se multiplica PrecioPublico * Cantidad para respetar
---         cuantas unidades se vendieron en cada ticket.
---
---      2. Calcula ganancia por consultas:
---         SUCURSAL, CLINICA y CONSULTA.
---         Se suma CONSULTA.CostoConsulta.
---
---      3. En ambas consultas se filtra por anio 2026.
---
---      4. COALESCE evita regresar NULL cuando no hay ventas o consultas.
--- ============================================================
+-- ii. Funcion: calculaganancias
+-- Objetivo:
+-- Calcular las ganancias de una sucursal durante el anio 2026.
+-- Parametro:
+-- p_nombre_sucursal VARCHAR(120)
+-- Nombre exacto de la sucursal, tomado de SUCURSAL.Nombre.
+-- Regresa:
+-- NUMERIC(12,2)
+-- Suma de:
+-- _ventas de medicamentos en tickets del anio 2026;
+-- _costos de consultas realizadas en el anio 2026.
+-- Desarrollo:
+-- 1. Calcula ganancia por medicamentos:
+-- SUCURSAL, TICKET, COMPRAR y MEDICAMENTO.
+-- Se multiplica PrecioPublico * Cantidad para respetar
+-- cuantas unidades se vendieron en cada ticket.
+-- 2. Calcula ganancia por consultas:
+-- SUCURSAL, CLINICA y CONSULTA.
+-- Se suma CONSULTA.CostoConsulta.
+-- 3. En ambas consultas se filtra por anio 2026.
+-- 4. COALESCE evita regresar NULL cuando no hay ventas o consultas.
+
 CREATE OR REPLACE FUNCTION calculaganancias(p_nombre_sucursal VARCHAR(120))
 RETURNS NUMERIC(12,2)
 AS $$
