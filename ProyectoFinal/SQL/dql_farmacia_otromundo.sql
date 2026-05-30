@@ -318,11 +318,9 @@ LEFT JOIN PerdidasInsumo AS PI
 ORDER BY UtilidadNeta DESC;
 
 
--- ============================================================
 --  CONSULTAS ADICIONALES (xiv - xxviii)
 --  Información administrativa de las sucursales de
 --  Una Farmacia de Otro Mundo.
--- ============================================================
 
 
 -- Consulta xiv
@@ -586,7 +584,7 @@ LIMIT 51;
 -- Consulta xxiii
 -- Pacientes con alergias registradas en alguna receta médica,
 -- mostrando el diagnóstico asociado y los medicamentos que se
--- les recetaron pese a la alergia. Útil para auditoría clínica.
+-- les recetaron pese a la alergia.
 
 SELECT
     C.IDCliente,
